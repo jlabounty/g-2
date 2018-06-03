@@ -1,0 +1,62 @@
+//Fill an art file with MIDAS data
+process_name : ibmsTutorial
+
+source: {
+  module_type : RootInput
+ }
+
+
+services : {
+
+ ODBHolder : {}
+ 
+ message : {
+
+   debugModules : ["*"]
+   suppressInfo : []
+
+   destinations : {
+     LogToConsole : {
+       type      : "cout"
+       threshold : "INFO"
+     }
+     LogToFile : {
+       type : "file"
+       filename : "gm2nearline_ibmsAnalyzer.log"
+       append : false
+       threshold : "INFO"
+     }
+   }
+
+  }//message
+
+}
+
+// modules that must run before filters
+
+
+physics : {
+
+  analyzers:{
+    ibmsAnalyzer: {
+    module_type: IBMSAnalyzer
+   ibmsRawModuleLabel: ibmsUnpacker
+   ibmsRawInstanceLabel: unpacker
+   //ibmsRawModuleLabel2: ibmsUnpackerNew
+   //ibmsRawInstanceLabel2: unpackerNew
+   SelectEvents: ["reconstruct:muonPath"]
+}
+ 
+ } // analyzers
+
+
+  // Define paths/streams
+  //muonPath : [ MuonFilter, ibmsProcessor ] 
+  analyzerPath  : [ibmsAnalyzer]  
+
+  //List trigger (producer/filter) and end (analyzer/output) paths
+  // trigger_paths : [muonPath]
+  // end_paths     : [dataOutputPath]
+
+}
+
