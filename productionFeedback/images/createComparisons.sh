@@ -19,7 +19,7 @@ for file in $baselinelist
 do
 	filenew=${file:19}
 	comparisonlist+=' '
-	comparisonlist+='./'$comparison'/'$baseline
+	comparisonlist+='./'$comparison'/'$comparison
 	comparisonlist+=$filenew
 
 	basenames+=' '
