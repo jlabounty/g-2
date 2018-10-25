@@ -78,6 +78,17 @@ def constructConditionFromUniqueIDEast( uniqueID ):
     
     return condition
 
+def constructConditionFromUniqueIDComp( uniqueID ):
+    uniqueID = str(uniqueID)
+    condition = (" runNum == "+str(int(uniqueID[0:5]))+
+                 " && subRunNum == "+str(int(uniqueID[5:10]))+
+                 " && fill == "+str(int(uniqueID[10:15]))+
+                 " && caloNum == "+str(int(uniqueID[15:20]))+
+                 " && islandWest == "+str(int(uniqueID[20:25]))
+                )
+    
+    return condition
+
 #returns the neighboring crystals in a grid in the form of an iterator
 def ReturnNeighbors_4(x, y):
     for i in range(x - 1, x + 2):
@@ -299,3 +310,22 @@ def islandPlot(uniqueIDref, teast, twest, twave, saveImage = True):
             plt.show()
 
             break
+			
+			
+#takes the unique id for a crystal and parses it into its components.
+def parseUniqueID(uniqueID, printKey = None):
+	uniqueID = str(uniqueID)
+	runNum = int(uniqueID[0:5])
+	subRunNum = int(uniqueID[5:10])
+	fillNum = int(uniqueID[10:15])
+	caloNum = int(uniqueID[15:20])
+	islandNum = int(uniqueID[20:25])
+	
+	if(printKey is True):
+		print("From UniqueID: ", uniqueID)
+		print("                runNum:", runNum)
+		print("                subRunNum:", subRunNum)
+		print("                fillNum:", fillNum)
+		print("                caloNum:", caloNum)
+		print("                islandNum:", islandNum)
+	return( (runNum, subRunNum, fillNum, caloNum, islandNum ) )
