@@ -111,10 +111,12 @@ fileNames = ["./data/dataExternal/Oct23DataSet/" + x for x in fileNamesPartial]
 
 
 #this will be the cut that will determine whether or not something is printed. Written in root format, not pyroot.
-condition = "TMath::Sqrt(TMath::Abs(deltaX)**2 + TMath::Abs(deltaY)**2) > 6 && timeEast > 30*1000/1.25" 
+#condition = "TMath::Sqrt(TMath::Abs(deltaX)**2 + TMath::Abs(deltaY)**2) > 5 && timeEast > 30*1000/1.25" 
+#condition = "TMath::Abs(deltaE) > 2000 && timeEast > 30*1000/1.25" 
+condition = "TMath::Abs(deltaT - timeCorr) > 3 && timeEast > 30*1000/1.25" 
 
 #name of the output file. Should reflect the cut, and the intputs.
-outFileName = "./data/dataExternal/TestEvents_deltaR_gt_5_timeCut_30_Oct23.root"
+outFileName = "./data/dataExternal/TestEvents_deltaT_gt_3_timeCut_30_Oct23.root"
 
 
 # In[ ]:
@@ -122,9 +124,10 @@ outFileName = "./data/dataExternal/TestEvents_deltaR_gt_5_timeCut_30_Oct23.root"
 nEventsMatching = 0
 
 for i, file in enumerate(fileNames):
-    print("Starting file",i,":", file)
+    print("Starting file",i+1,"/",len(fileNames),":", file)
     #if i > 2:
     #    break
+
     #open up the input file
     try:
         f = r.TFile(file,"read")
@@ -139,7 +142,8 @@ for i, file in enumerate(fileNames):
         fout = r.TFile(outFileName,"recreate")
         #create a tree to store the output, and fill it based on the condition.
         tfinal = tcomp.CopyTree( condition )
-        nEventsMatching += tfinal.GetEvents()
+        nEventsMatchingi = tfinal.GetEntries()
+        nEventsMatching += nEventsMatchingi
         #write the tree to the file
         tfinal.Write()
     else:
@@ -151,7 +155,8 @@ for i, file in enumerate(fileNames):
         tbefore.SetName("tbefore")
         #create a temporary tree to store the output
         ti = tcomp.CopyTree( condition )
-        nEventsMatching += ti.GetEvents()
+        nEventsMatchingi = ti.GetEntries()
+        nEventsMatching += nEventsMatchingi
         #add the temp tree to tfinal using TList
         listoftrees = r.TList()
         listoftrees.Add(tbefore)
@@ -166,9 +171,10 @@ for i, file in enumerate(fileNames):
         #tbefore.Delete()
         #ti.Delete()
 
+    print("     Found", nEventsMatchingi, "clusters")
 
     fout.Write()
     fout.Close()
 
-print("Found", mEventsMatching, "clusters")
+print("Found", nEventsMatching, "clusters")
 print("All done. Output file: ", outFileName)
