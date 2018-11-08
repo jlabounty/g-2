@@ -42,6 +42,11 @@ def constructUniqueIDwave( entry ):
     uniqueID = int(str(entry.runNum).zfill(5) + str(entry.subRunNum).zfill(5) + str(entry.fillNum).zfill(5) +
                             str(entry.caloNum).zfill(5) + str(entry.islandNum).zfill(5)) 
     return uniqueID
+def constructUniqueIDnon( entry ):
+    uniqueID = int(str(entry.runNum).zfill(5) + str(entry.subRunNum).zfill(5) + str(entry.fill).zfill(5) +
+                            str(entry.caloNum).zfill(5) + str(entry.island).zfill(5)) 
+    return uniqueID
+
 
 
 #conversly, we also sometimes need to construct the conditions necessary to isolate an island given a uniqueID
@@ -98,7 +103,9 @@ def ReturnNeighbors_4(x, y):
 			
 
 #turns a vector of length 54, with xtals going from 0 -> 53 into a proper caloMap compatable with imshow()
-def arrangeXtals( vec1 ):
+import copy
+def arrangeXtals( input ):
+    vec1 = input.copy() #prevents us from changing original
     vec1.reverse() #imshow starts in upper left corner, so need to reverse the ordering of the xtals.
     list1 = []
     list2 = []
@@ -122,6 +129,17 @@ def toMap( crystalsInCluster ):
 
     list1 = arrangeXtals( xtalMapEast )
     return( list1 )
+
+
+def toFlatMap( crystalsInCluster ):
+    xtalMapEast = []
+    for i in range(54):
+        if(i in crystalsInCluster):
+            xtalMapEast.append(1)
+        else:
+            xtalMapEast.append(0)
+
+    return( xtalMapEast )
 
 
 #takes two maps and overlays them with imshow
