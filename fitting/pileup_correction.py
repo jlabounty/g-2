@@ -25,7 +25,7 @@ class PileupCorrector:
         self.name = name
         self.iteration = iteration 
         self.deltat = deltat
-        self.verbosity = 0
+        self.verbosity = verbosity
 
         self.rhoDouble = None 
 
@@ -225,3 +225,23 @@ class PileupCorrector:
         self.ComputeTripleCorrection()
         self.FitTriplePileupAndApplyCorrection()
         print("Correction completed! Final histogram stored in h_pileupCorrected")
+
+def GetTH2FromTH3( h3, caloNum ):
+    '''
+        Takes the TH3 of t vs. E vs. calo and projects it into t vs. E for given calo number
+        Inputs:
+            h3 (TH3)
+            caloNum (int) : 0 = all calos
+        Output:
+            h2 (TH2)
+    '''
+    if(caloNum > 0 and caloNum < 25):
+        caloBin = h3.GetZaxis().FindBin(caloNum)
+        h3.GetZaxis().SetRange(caloBin, caloBin)
+    elif( caloNum != 0 ):
+        raise ValueError("caloNum is out of scipe")
+    else:
+        h3.GetZaxis().UnZoom()
+    
+    h2 = h3.Project3D("yx")
+    return h2.Clone("h_xy")

@@ -191,9 +191,9 @@ class BuildTF1:
             raise ValueError("Number of parameters does not match initialzed value")
             
     #quickly initialize to avoid divide by zero errors
-    def SetDumbParameters(self):
+    def SetDumbParameters(self, par = 1):
         for i in range(self.nPar):
-            self.f.SetParameter(i, 1)
+            self.f.SetParameter(i, par)
             
     def SetParameter(self, i, par):
         if(i > self.nPar - 1):
@@ -216,6 +216,12 @@ class BuildTF1:
         else:
             for i in range(self.nPar):
                 self.f.SetParName(i, names[i])
+
+    def ImportParameters(self, prevFunc):
+        if(self.nPar < prevFunc.GetNpar() ):
+            raise ValueError("Parameters do not match")
+        for i in range(prevFunc.GetNpar()):
+            self.f.SetParameter(i, prevFunc.GetParameter(i) )
 
 class WiggleFitter():
     '''
@@ -246,31 +252,40 @@ class WiggleFitter():
         
 
         self.intermediateParameters = []
+        self.intermediateErrors = []
         self.intermediateChi2 = []
+        self.pt = r.TPaveText(.7,.2,.95,0.95,"brNDC")
 
-    def StoreIntermediateParameters(self, pars, chi2):
+    def StoreIntermediateParameters(self, pars, parErrs, chi2):
         self.intermediateParameters.append(pars)
+        self.intermediateErrors.append(parErrs)
         self.intermediateChi2.append(chi2)
 
     def PrintParameters(self):
+        print("Parameters from this fit: ")
         for i in range(self.nPar):
-            print( self.f.GetParName(i), " = ", self.f.GetParameter(i), "+/-", self.f.GetParError(i) )
+            print("     ", self.f.GetParName(i), " = ", self.f.GetParameter(i), "+/-", self.f.GetParError(i) )
 
     def Fit(self, verbosity = 0):
         for i in range(self.nFit):
+            if(verbosity > 0):
+                print("Starting fit", i+1, "/", self.nFit)
             self.h.Fit(self.f, self.fitOptions)
             parametersi = [ self.f.GetParameter(x) for x in range( self.nPar ) ]
+            parErrsi = [ self.f.GetParError(x) for x in range( self.nPar ) ]
             if(self.f.GetNDF() > 0):
-                self.StoreIntermediateParameters( parametersi, self.f.GetChisquare() / self.f.GetNDF() )
+                self.StoreIntermediateParameters( parametersi, parErrsi, self.f.GetChisquare() / self.f.GetNDF() )
             else:
-                self.StoreIntermediateParameters( parametersi, np.nan )
+                self.StoreIntermediateParameters( parametersi, parErrsi, np.nan )
             if(verbosity > 0):
                 self.PrintParameters()
 
         self.ComputeResiduals()
+        self.ComputeFFT(self.fitLow, self.fitHigh)
 
     def ComputeResiduals(self):
         self.resid = self.h.Clone("h_resid_"+self.name)
+        self.resid.SetTitle("Residuals")
         self.resid.Reset()
         for i in range(self.resid.GetNbinsX()):
             ri = self.h.GetBinContent(i) - self.f.Eval( self.h.GetBinCenter(i) )
@@ -282,7 +297,94 @@ class WiggleFitter():
             self.fft = fourierXformWiggle( self.h, self.f, self.fitLow, self.fitHigh, title )
         else:
             self.fft = fourierXformWiggle( self.h, self.f, t1, t2, title )
+
+    def Draw(self, t1 = None, t2 = None):
+
+        c = r.TCanvas("c","c",1000,700)
+        #c.Divide(1,2)
+
+        c.cd(0)
+        p1 = r.TPad("p1","p1",0,0.4,1,1)
+        p1.Draw()
+        p1.cd()
+
+        if(t1 == None or t2 == None):
+            t1 = self.fitLow
+            t2 = self.fitHigh
+        self.h.GetXaxis().SetRangeUser(t1,t2)
+        self.h.SetStats(False)
+        self.h.Draw("hist e")
+        self.f.Draw("SAME")
+
+        self.pt.Clear()
+        self.pt.SetTextAlign(11)
+        self.pt.AddText("ChiSq / NDF = "+str(self.f.GetChisquare())+" / "+str(self.f.GetNDF()))
+        if(self.f.GetNDF() != 0 ):
+            self.pt.AddText("            = "+str(self.f.GetChisquare() / self.f.GetNDF() ) )
+        for i in range(self.nPar):
+            texti = ( self.f.GetParName(i)+" = "+
+                    '{:0.5e}'.format( self.f.GetParameter(i) )+" #pm "+
+                    '{:0.5e}'.format( self.f.GetParError(i) ) )
+            self.pt.AddText( texti )
+        self.pt.Draw()
+        p1.Draw()
         
+        r.gPad.SetLogy()
+        r.gPad.SetGrid()
+
+        
+        c.cd(0)
+        p2 = r.TPad("p2","p2",0,0,1,0.4)
+        p2.Draw()
+        p2.cd()
+        self.resid.SetStats(False)
+        self.resid.Draw()
+        self.resid.GetXaxis().SetRangeUser(t1,t2)
+
+        #r.gPad.SetLogy()
+        r.gPad.SetGrid()
+
+        c.Modified()
+        c.Update()
+        c.Draw()
+
+        return c
+
+class MakeWiggleFromTH3:
+    '''
+        From the TH3 of Energy vs. Time vs. Calo, create a TH1 which will be passed to the fitter
+    '''
+    def __init__(self, h3, elow, ehigh, caloNum = 0, timeScaleFactor = 1 , isPileupCorrected = False, 
+                                 BinOrEnergy = "energy" ):
+        # dont save th3 for memory reasons
+        self.elow = elow
+        self.ehigh = ehigh
+        self.timeScaleFactor = timeScaleFactor
+        self.caloNum = caloNum
+        self.isPileupCorrected = isPileupCorrected
+        self.BinOrEnergy = BinOrEnergy
+
+        h3.GetXaxis().UnZoom()
+        if(BinOrEnergy == "energy"):
+            h3.GetYaxis().SetRangeUser(elow, ehigh)
+            self.title = "Wiggle Plot for ["+str(elow)+" < E (MeV) < "+str(ehigh)+"] in Calo "+str(caloNum)
+        elif(BinOrEnergy == "bin"):
+            h3.GetYaxis().SetRange(elow, ehigh)
+            self.title = "Wiggle Plot for ["+str(elow)+" < E (Bin) < "+str(ehigh)+"] in Calo "+str(caloNum)
+        else:
+            raise ValueError("BinOrEnergy has an unsupported value")
+
+        if(caloNum == 0):
+            h3.GetZaxis().UnZoom()
+        elif(caloNum > 24 or caloNum < 0):
+            raise ValueError("Calo Number is outside allowed range")
+        else:
+            caloBin = h3.GetZaxis().FindBin(caloNum)
+            h3.GetZaxis().SetRange(caloBin)
+
+        self.h = h3.Project3D("x").Clone("wiggle_"+str(elow)+"_"+str(ehigh)+"_"+str(caloNum))
+        self.h.SetTitle(self.title)
+
 
 # performs a fourier transform on the residuals from a plot.
 def fourierXformWiggle( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, title ):
@@ -292,7 +394,7 @@ def fourierXformWiggle( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, titl
     c3 = r.TCanvas()
     residualsFull_5Param = wigglePlot.Clone() 
     nBins = residualsFull_5Param.GetSize() - 2 #total number of bins excluding over/underflow
-    print(nBins)
+    #print(nBins)
     residVec = []
     for i in range(nBins):
         binCenterX = wigglePlot.GetXaxis().GetBinCenter(i)
@@ -302,7 +404,7 @@ def fourierXformWiggle( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, titl
         else:
             residualsFull_5Param.SetBinContent(i, 0)
 
-    print(len(residVec),[residVec[i] for i in range(5)])
+    #print(len(residVec),[residVec[i] for i in range(5)])
     centers, bins = zip(*residVec)
     htest = r.TH1D("htest","htest",len(residVec),centers[0],centers[len(residVec)-1])
     for i,ding in enumerate(bins):
@@ -347,17 +449,17 @@ def fourierXformWiggle( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, titl
     maxBinCenter = residualsFull_5Param.GetXaxis().GetBinCenter(Npart)
 
     capT = maxBinCenter - minBinCenter
-    print(Npart, capT, minBinCenter, maxBinCenter)
+    #print(Npart, capT, minBinCenter, maxBinCenter)
     deltaT = capT/Npart #microseconds
     deltaF = 1/capT
-    print(deltaT, deltaF)
+    #print(deltaT, deltaF)
 
     deltaTns = deltaT*1000 #nanoseconds
     limmaxHz = (1/(deltaTns*math.pow(10.0,-9)))
     limmaxMHz = limmaxHz / math.pow(10.0,6)
 
     limmax = 2*deltaF*Npart #400-25
-    print(limmax,limmaxMHz)
+    #print(limmax,limmaxMHz)
     #hxform.GetXaxis().SetLimits(0,limmax)
     nbins = residualsFull_5Param.GetSize() - 2
     hxform.SetBins(Npart,0,limmaxMHz)

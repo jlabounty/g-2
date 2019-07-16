@@ -11,3 +11,12 @@ def DumpClass( item ):
             print("   ", var, "=", ding[var])
     except:
         print("Unable to dump members of this class")
+
+def GetBlindingPhrase( file ):
+    '''
+        simple util to get the first line of a file and return as string for use as a blinding phrase
+    '''
+    with open(file) as f:
+        content = f.readlines()
+        phrase = content[0].strip()
+    return str(phrase)
