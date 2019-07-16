@@ -124,7 +124,8 @@ class WiggleFit:
             raise AttributeError("ERROR: Kloss Histogram has not been initialized")
         
         return ( norm * math.exp(-time/life) * cCBO * cVW * (1 - ACBO*math.cos(omega*time + phiCBO)) 
-                * (1 - Kloss*self.KlossHist.GetBinContent(self.KlossHist.FindBin(time))) )
+                #* (1 - Kloss*self.KlossHist.GetBinContent(self.KlossHist.FindBin(time))) ) #no interpolation
+                * (1 - Kloss*self.KlossHist.Interpolate(time)) )
     
     
     def __init__(self, blindingPhrase, kind):
@@ -147,11 +148,13 @@ class WiggleFit:
 
 class BuildTF1:
     '''
-        Class which takes as input a WiggleFit object and uses it to construct a TF1 with the correct parameters / parameter names
+        Class which takes as input a WiggleFit object and uses it to construct a TF1 with the correct 
+        parameters / parameter names
         Takes the following inputs:
             func (WiggleFit): the function to fit
             nPar (int): number of parameters
-            kind (str): the kind of function (somewhat redundant, but one could imagine having multiple functions with the same nPar)
+            kind (str): the kind of function (somewhat redundant, but one could imagine having multiple functions with 
+                the same nPar)
             name (str): the to give the function
             fitLow (double): the lower bound of the function
             fitHigh (double): the upper bound of the function
@@ -177,7 +180,6 @@ class BuildTF1:
     '''
         Set the parameters of the fit.
         Inputs:
-            nPar: number of parameters
             parameters: list of parameter values
     '''
     def SetParameters(self, parameters):
@@ -217,7 +219,8 @@ class BuildTF1:
 
 class WiggleFitter():
     '''
-        Fits the histogram with the included options any number of times. Stores intermediate parameters and chi2 values.
+        Fits the histogram with the included options any number of times. 
+        Stores intermediate parameters and chi2 values.
         Inputs:
             hist (TH1)
             fit (TF1)
