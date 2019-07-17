@@ -12,17 +12,25 @@ class MuonLoss:
     '''
         A class to hold/compute the muon loss histogram. 
         Inputs:
-            triples (th1)
-            backwards triples (th1)
+            triples (th2)
+            backwards triples (th2)
+            caloNum (int): which calo to compute the correction for. 0 = all
             Muon lifetime (double)
             iteration (int) : how many times this has gone through the fitter
         Outputs:
             Muon loss function in histogram form (TH1)
     '''
 
-    def __init__(self, triples, backwardsTriples, lifetime, iteration = 0, subtractBackwards = False):
-        self.triples = triples.Clone("triples")
-        self.backwardsTriples = backwardsTriples.Clone("b_triples")
+    def __init__(self, triples, backwardsTriples, lifetime, iteration = 0, subtractBackwards = False, caloNum = 0):
+        if(caloNum < 0 or caloNum > 24):
+            raise ValueError("caloNum out of range")
+        elif(caloNum > 0 and caloNum < 25):
+            binY = triples.GetYaxis().FindBin(caloNum)
+            triples.GetYaxis().SetRange(binY, binY)
+            backwardsTriples.GetYaxis().SetRange(binY, binY)
+
+        self.triples = triples.ProjectionX().Clone("triples")
+        self.backwardsTriples = backwardsTriples.ProjectionX().Clone("b_triples")
         self.tau = lifetime
         self.subtractBackwards = subtractBackwards
 

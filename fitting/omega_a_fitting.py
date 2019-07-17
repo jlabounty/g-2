@@ -162,7 +162,7 @@ class BuildTF1:
     
     def __init__(self, func, nPar, kind, name, fitLow, fitHigh):
         if(func.kind != kind):
-            raise ValueError("The kind of function being defined here does not match")
+            raise ValueError("The kind of function being defined here does not match: "+str(kind)+" (new) vs. "+(func.kind))
         self.f = r.TF1(name, func, fitLow, fitHigh, nPar)
         self.f.SetNpx(10000)
         self.nPar = nPar
@@ -194,12 +194,14 @@ class BuildTF1:
     def SetDumbParameters(self, par = 1):
         for i in range(self.nPar):
             self.f.SetParameter(i, par)
+            self.initialParameters[i] = par
             
     def SetParameter(self, i, par):
         if(i > self.nPar - 1):
             raise ValueError("This parameter number is outside the range")
         else:
             self.f.SetParameter(i, par)
+            self.initialParameters[i] = par
             
     def SetParLimits(self, i, lim1, lim2):
         if(i > self.nPar - 1):
@@ -254,7 +256,11 @@ class WiggleFitter():
         self.intermediateParameters = []
         self.intermediateErrors = []
         self.intermediateChi2 = []
+
         self.pt = r.TPaveText(.7,.2,.95,0.95,"brNDC")
+        self.pt.SetLabel("Parameters Text Box")
+        
+        self.resid = None
 
     def StoreIntermediateParameters(self, pars, parErrs, chi2):
         self.intermediateParameters.append(pars)
@@ -263,8 +269,16 @@ class WiggleFitter():
 
     def PrintParameters(self):
         print("Parameters from this fit: ")
+        if( self.f.GetNDF() != 0):
+            print("     ChiSq/NDF = ", self.f.GetChisquare(), "/", self.f.GetNDF(),"=", self.f.GetChisquare() / self.f.GetNDF())
         for i in range(self.nPar):
             print("     ", self.f.GetParName(i), " = ", self.f.GetParameter(i), "+/-", self.f.GetParError(i) )
+
+    def DumpParameters(self):
+        return [ (self.f.GetParameter(i), self.f.GetParError(i)) for i in range(nPar) ]
+
+    def DumpChiSquare(self):
+        return [ self.f.GetChisquare(), self.f.GetNDF() ]
 
     def Fit(self, verbosity = 0):
         for i in range(self.nFit):
@@ -337,6 +351,8 @@ class WiggleFitter():
         p2 = r.TPad("p2","p2",0,0,1,0.4)
         p2.Draw()
         p2.cd()
+        if(self.resid == None):
+            self.ComputeResiduals()
         self.resid.SetStats(False)
         self.resid.Draw()
         self.resid.GetXaxis().SetRangeUser(t1,t2)
@@ -349,6 +365,13 @@ class WiggleFitter():
         c.Draw()
 
         return c
+
+    def ReturnParameters(self):
+        pars = []
+        for i in range(self.nPar):
+            pars.append( (self.f.GetParameter(i), self.f.GetParError(i)) )
+        return pars
+
 
 class MakeWiggleFromTH3:
     '''
@@ -458,10 +481,10 @@ def fourierXformWiggle( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, titl
     limmaxHz = (1/(deltaTns*math.pow(10.0,-9)))
     limmaxMHz = limmaxHz / math.pow(10.0,6)
 
-    limmax = 2*deltaF*Npart #400-25
+    #limmax = 2*deltaF*Npart #400-25
     #print(limmax,limmaxMHz)
     #hxform.GetXaxis().SetLimits(0,limmax)
-    nbins = residualsFull_5Param.GetSize() - 2
+    #nbins = residualsFull_5Param.GetSize() - 2
     hxform.SetBins(Npart,0,limmaxMHz)
     hxform.GetXaxis().SetRangeUser(0,limmaxMHz/2)
     #hxform.GetXaxis().SetRangeUser(0,1.4)

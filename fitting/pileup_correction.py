@@ -27,7 +27,11 @@ class PileupCorrector:
         self.deltat = deltat
         self.verbosity = verbosity
 
-        self.rhoDouble = None 
+        #self.rhoDouble = None 
+        #self.doublePileup = None
+        #self.doublePileupY = None
+        #self.triplePileup = None
+        #self.triplePileupY = None
 
     ''' Allows us to skip the step of calculating rho_double if we have one already saved '''
     def SetRhoDouble(self, h):
@@ -61,6 +65,7 @@ class PileupCorrector:
     def ComputeRhoDouble(self):
         self.rhoDouble = self.h.Clone("h_rhoDouble_"+str(self.iteration)+"_"+self.name)
         self.rhoDouble.Reset()
+        self.rhoDouble.SetDirectory(0)
 
         nBinsX = self.rhoDouble.GetXaxis().GetNbins()
         nBinsY = self.rhoDouble.GetYaxis().GetNbins()
@@ -97,6 +102,7 @@ class PileupCorrector:
 
         self.doublePileup = self.h.Clone("DoublePileup_"+str(self.iteration)+"_"+self.name)
         self.doublePileup.Reset()
+        self.doublePileup.SetDirectory(0)
         self.doublePileup.SetTitle("Double Pileup [Unscaled]")
 
         nBinsX = self.doublePileup.GetXaxis().GetNbins()
@@ -225,6 +231,8 @@ class PileupCorrector:
         self.ComputeTripleCorrection()
         self.FitTriplePileupAndApplyCorrection()
         print("Correction completed! Final histogram stored in h_pileupCorrected")
+
+
 
 def GetTH2FromTH3( h3, caloNum ):
     '''
