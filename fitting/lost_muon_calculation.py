@@ -33,6 +33,7 @@ class MuonLoss:
         self.backwardsTriples = backwardsTriples.ProjectionX().Clone("b_triples")
         self.tau = lifetime
         self.subtractBackwards = subtractBackwards
+        self.caloNum = caloNum
 
         self.muonLossHist = None
         self.iteration = iteration

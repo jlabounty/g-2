@@ -105,6 +105,14 @@ class SaveToRootFile():
                 hi2.SetDirectory(self.file)
                 self.file.Write()
 
+            elif( "ROOT.TF1" in (str(type(item))) ):
+                f1 = dic[key]
+                f1.Write()
+
+            elif( "ROOT.TPaveText" in (str(type(item))) ):
+                p1 = dic[key]
+                p1.Write()
+
             else:
                 print("Type not supported", type(item) )
 

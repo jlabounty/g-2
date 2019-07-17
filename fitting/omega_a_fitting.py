@@ -330,16 +330,7 @@ class WiggleFitter():
         self.h.Draw("hist e")
         self.f.Draw("SAME")
 
-        self.pt.Clear()
-        self.pt.SetTextAlign(11)
-        self.pt.AddText("ChiSq / NDF = "+str(self.f.GetChisquare())+" / "+str(self.f.GetNDF()))
-        if(self.f.GetNDF() != 0 ):
-            self.pt.AddText("            = "+str(self.f.GetChisquare() / self.f.GetNDF() ) )
-        for i in range(self.nPar):
-            texti = ( self.f.GetParName(i)+" = "+
-                    '{:0.5e}'.format( self.f.GetParameter(i) )+" #pm "+
-                    '{:0.5e}'.format( self.f.GetParError(i) ) )
-            self.pt.AddText( texti )
+        self.FillParametersBox()
         self.pt.Draw()
         p1.Draw()
         
@@ -371,6 +362,18 @@ class WiggleFitter():
         for i in range(self.nPar):
             pars.append( (self.f.GetParameter(i), self.f.GetParError(i)) )
         return pars
+
+    def FillParametersBox(self):
+        self.pt.Clear()
+        self.pt.SetTextAlign(11)
+        self.pt.AddText("ChiSq / NDF = "+str(self.f.GetChisquare())+" / "+str(self.f.GetNDF()))
+        if(self.f.GetNDF() != 0 ):
+            self.pt.AddText("            = "+str(self.f.GetChisquare() / self.f.GetNDF() ) )
+        for i in range(self.nPar):
+            texti = ( self.f.GetParName(i)+" = "+
+                    '{:0.5e}'.format( self.f.GetParameter(i) )+" #pm "+
+                    '{:0.5e}'.format( self.f.GetParError(i) ) )
+            self.pt.AddText( texti )
 
 
 class MakeWiggleFromTH3:
