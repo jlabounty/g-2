@@ -43,65 +43,76 @@ from evwTools import *
 
 #Names of the files to loop over
 
-fileNamesPartial = ["gm2offline_ana_12653990_16369.00449.root",
-            "gm2offline_ana_12653991_16369.00045.root",
-            "gm2offline_ana_12653992_16367.00444.root",
-            "gm2offline_ana_12653993_16358.00045.root",
-            "gm2offline_ana_12653994_16355.00098.root",
-            "gm2offline_ana_12653995_16369.00495.root",
-            "gm2offline_ana_12653996_16369.00129.root",
-            "gm2offline_ana_12653997_16356.00472.root",
-            "gm2offline_ana_12653998_16370.00100.root",
-            "gm2offline_ana_12653999_16368.00142.root",
-            "gm2offline_ana_12654000_16358.00108.root",
-            "gm2offline_ana_12654001_16362.00028.root",
-            "gm2offline_ana_12654002_16370.00193.root",
-            "gm2offline_ana_12654003_16364.00096.root",
-            "gm2offline_ana_12654004_16367.00414.root",
-            "gm2offline_ana_12654005_16367.00137.root",
-            "gm2offline_ana_12654006_16357.00150.root",
-            "gm2offline_ana_12654007_16357.00046.root",
-            "gm2offline_ana_12654008_16370.00438.root",
-            "gm2offline_ana_12654009_16364.00339.root",
-            "gm2offline_ana_12654010_16358.00008.root",
-            "gm2offline_ana_12654011_16368.00282.root",
-            "gm2offline_ana_12654012_16363.00212.root",
-            "gm2offline_ana_12654013_16369.00099.root",
-            "gm2offline_ana_12654014_16367.00496.root",
-            "gm2offline_ana_12654015_16362.00160.root",
-            "gm2offline_ana_12654016_16363.00311.root",
-            "gm2offline_ana_12654017_16368.00107.root",
-            "gm2offline_ana_12654018_16356.00104.root",
-            "gm2offline_ana_12654019_16370.00040.root",
-            "gm2offline_ana_12654020_16363.00374.root",
-            "gm2offline_ana_12654021_16370.00393.root",
-            "gm2offline_ana_12654022_16359.00111.root",
-            "gm2offline_ana_12654023_16369.00492.root",
-            "gm2offline_ana_12654024_16359.00065.root",
-            "gm2offline_ana_12654025_16358.00375.root",
-            "gm2offline_ana_12654026_16363.00094.root",
-            "gm2offline_ana_12654027_16367.00093.root",
-            "gm2offline_ana_12654028_16370.00218.root",
-            "gm2offline_ana_12654029_16368.00396.root",
-            "gm2offline_ana_12654030_16365.00141.root",
-            "gm2offline_ana_12654031_16356.00210.root",
-            "gm2offline_ana_12654032_16367.00251.root",
-            "gm2offline_ana_12654034_16364.00077.root",
-            "gm2offline_ana_12654035_16363.00257.root",
-            "gm2offline_ana_12654036_16367.00005.root",
-            "gm2offline_ana_12654037_16367.00128.root",
-            "gm2offline_ana_12654038_16365.00367.root",
-            "gm2offline_ana_12654039_16358.00025.root",
-            "gm2offline_ana_12654040_16363.00479.root",
-            "gm2offline_ana_12654041_16369.00155.root",
-            "gm2offline_ana_12654042_16368.00421.root",
-            "gm2offline_ana_12654043_16356.00252.root",
-            "gm2offline_ana_12654044_16358.00237.root",
-            "gm2offline_ana_12654045_16355.00136.root",
-            "gm2offline_ana_12654046_16358.00053.root"]
+'''
+fileNamesPartial = ["gm2offline_ana_12769487_15932.00176.root",
+                    "gm2offline_ana_12769488_15929.00040.root",
+                    "gm2offline_ana_12769489_15928.00148.root",
+                    "gm2offline_ana_12769490_15926.00236.root",
+                    "gm2offline_ana_12769491_15925.00138.root",
+                    "gm2offline_ana_12769502_15932.00136.root",
+                    "gm2offline_ana_12769503_15925.00302.root",
+                    "gm2offline_ana_12769504_15932.00404.root",
+                    "gm2offline_ana_12769505_15924.00114.root",
+                    "gm2offline_ana_12769506_15926.00463.root",
+                    "gm2offline_ana_12769517_15925.00347.root",
+                    "gm2offline_ana_12769518_15925.00416.root",
+                    "gm2offline_ana_12769519_15923.00286.root",
+                    "gm2offline_ana_12769520_15929.00068.root",
+                    "gm2offline_ana_12769521_15927.00098.root",
+                    "gm2offline_ana_12769532_15926.00341.root",
+                    "gm2offline_ana_12769533_15930.00326.root",
+                    "gm2offline_ana_12769534_15932.00270.root",
+                    "gm2offline_ana_12769535_15926.00098.root",
+                    "gm2offline_ana_12769536_15922.00104.root",
+                    "gm2offline_ana_12769547_15927.00076.root",
+                    "gm2offline_ana_12769548_15931.00241.root",
+                    "gm2offline_ana_12769549_15926.00137.root",
+                    "gm2offline_ana_12769550_15926.00289.root",
+                    "gm2offline_ana_12769551_15925.00292.root",
+                    "gm2offline_ana_12769563_15933.00156.root",
+                    "gm2offline_ana_12769564_15921.00059.root",
+                    "gm2offline_ana_12769565_15930.00026.root",
+                    "gm2offline_ana_12769567_15928.00147.root",
+                    "gm2offline_ana_12769568_15926.00188.root",
+                    "gm2offline_ana_12769579_15932.00352.root",
+                    "gm2offline_ana_12769580_15922.00429.root",
+                    "gm2offline_ana_12769581_15933.00346.root",
+                    "gm2offline_ana_12769582_15930.00193.root",
+                    "gm2offline_ana_12769583_15929.00109.root",
+                    "gm2offline_ana_12769594_15925.00436.root",
+                    "gm2offline_ana_12769595_15926.00212.root",
+                    "gm2offline_ana_12769596_15926.00271.root",
+                    "gm2offline_ana_12769597_15925.00479.root",
+                    "gm2offline_ana_12769598_15931.00313.root",
+                    "gm2offline_ana_12769610_15922.00054.root",
+                    "gm2offline_ana_12769611_15922.00291.root",
+                    "gm2offline_ana_12769612_15922.00098.root",
+                    "gm2offline_ana_12769613_15921.00360.root",
+                    "gm2offline_ana_12769614_15922.00021.root",
+                    "gm2offline_ana_12769627_15926.00409.root",
+                    "gm2offline_ana_12769628_15932.00428.root",
+                    "gm2offline_ana_12769629_15926.00443.root",
+                    "gm2offline_ana_12769630_15926.00345.root",
+                    "gm2offline_ana_12769631_15924.00247.root",
+                    "gm2offline_ana_12769642_15931.00001.root",
+                    "gm2offline_ana_12769643_15922.00156.root",
+                    "gm2offline_ana_12769644_15927.00012.root",
+                    "gm2offline_ana_12769645_15925.00478.root",
+                    "gm2offline_ana_12769646_15927.00436.root",
+                    "gm2offline_ana_12769657_15928.00123.root",
+                    "gm2offline_ana_12769658_15924.00077.root",
+                    "gm2offline_ana_12769659_15933.00299.root",
+                    "gm2offline_ana_12769660_15929.00372.root",
+                    "gm2offline_ana_12769661_15925.00189.root",
+                    "gm2offline_ana_12769672_15928.00105.root",
+                    "gm2offline_ana_12769673_15930.00328.root"]
 
 #and their paths.
-fileNames = ["./data/dataExternal/Oct23DataSet/" + x for x in fileNamesPartial]
+fileNames = ["./data/dataExternal/Oct29_v10_DataSet/" + x for x in fileNamesPartial]
+'''
+
+fileNamesPartial = ["results_full_partial_v9_11_Nov14.root"]
+fileNames = ["./data/dataExternal/Nov14_v11_60hr_PartialSet_WrongTimeConstants/" + x for x in fileNamesPartial]
 
 #uncomment this to just loop over the local file for which we also have the island data
 #fileNames = ["./data/gm2offline_ana.root"]
@@ -111,17 +122,25 @@ fileNames = ["./data/dataExternal/Oct23DataSet/" + x for x in fileNamesPartial]
 
 
 #this will be the cut that will determine whether or not something is printed. Written in root format, not pyroot.
-#condition = "TMath::Sqrt(TMath::Abs(deltaX)**2 + TMath::Abs(deltaY)**2) > 5 && timeEast > 30*1000/1.25" 
-#condition = "TMath::Abs(deltaE) > 2000 && timeEast > 30*1000/1.25" 
-condition = "TMath::Abs(deltaT - timeCorr) > 3 && timeEast > 30*1000/1.25" 
+#condition = "((TMath::Abs(deltaX)**2)/(3**2) + (TMath::Abs(deltaY)**2)/(2**2)) > 1 && timeEast > 100*1000/1.25" 
+#condition = "TMath::Abs(deltaE) > 1700 && timeEast > 100*1000/1.25" 
+condition = "TMath::Abs(deltaT - timeCorr) > 3 && timeEast > 100*1000/1.25" 
+#condition = "TMath::Sqrt(TMath::Abs(deltaX)**2 + TMath::Abs(deltaY)**2) < 0.25 && TMath::Abs(deltaE) < 250 && energyWest > 1500 && TMath::Abs(deltaT-timeCorr) < 2 && timeEast > 100*1000/1.25" 
+#condition = "TMath::Abs(deltaE) < 500 && TMath::Abs(KS) > 0.95 && energyWest > 1000 && timeEast > 100*1000/1.25" 
+#condition = "condition = "energyEast > 1500 && energyEast < 2500 && energyWest > 3200 && energyWest < 5000"
+#condition = "deltaX > 4.5 && delta Y > 2.25 && deltaX < 5.5 && deltaY < 3.75"
+#condition = "deltaX > 2 && delta Y > -3 && deltaX < 4 && deltaY < -1 && TMath::Abs(deltaT - timeCorr) > 3"
+#condition = "energyWest > 2700 && energyWest < 3500 && energyEast > 1500 && energyEast < 2100"
 
+print("Cutting on:", condition)
 #name of the output file. Should reflect the cut, and the intputs.
-outFileName = "./data/dataExternal/TestEvents_deltaT_gt_3_timeCut_30_Oct23.root"
+outFileName = "./data/dataExternal/TestEvents_deltaT_abs_gt_3_Nov14_v9_11.root"
 
 
 # In[ ]:
 
 nEventsMatching = 0
+cutoffPoint = 3000000
 
 for i, file in enumerate(fileNames):
     print("Starting file",i+1,"/",len(fileNames),":", file)
@@ -175,6 +194,10 @@ for i, file in enumerate(fileNames):
 
     fout.Write()
     fout.Close()
+
+    if(nEventsMatching > cutoffPoint):
+        print("Exceeded maximum number of clusters. Stopping here.")
+        break
 
 print("Found", nEventsMatching, "clusters")
 print("All done. Output file: ", outFileName)

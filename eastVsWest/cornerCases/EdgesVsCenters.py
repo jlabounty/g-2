@@ -10,11 +10,12 @@ from evwTools import *
 # In[5]:
 
 
-files = ["results_full.root"]
-#files = ["gm2offline_ana_12396088_16357.00078.root"]
-path = "/home/jlab/g-2/eastVsWest/data/dataExternal/Oct16DataSet/"
+#path = "/home/jlab/g-2/eastVsWest/data/dataExternal/Oct16DataSet/"
+path="../data/"
+#files = ["results_full.root"]
+files = ["gm2offline_ana_13084967_16358.00241.root"]
 #this is only a subset, but I have it unpacked already.
-prodString = 'v9_08_NewCalibration'
+prodString = 'v9_08_EnergyFix'
 
 for file in files:
 	print("Starting file:", file)
@@ -47,8 +48,8 @@ for file in files:
 	    hi.Draw("COLZ")
 	    r.gPad.SetLogz()
 	c.Draw()
-	c.Print("./Edges"+prodString+:".root")
-	c.Print("./Edges"+prodString+:".png")
+	c.Print("./Edges"+prodString+".root")
+	c.Print("./Edges"+prodString+".png")
 
 
 	# In[18]:
@@ -76,7 +77,7 @@ for file in files:
 	    r.gPad.SetLogz()
 	c.Draw()
 
-	c.Print("./Centers"+prodString+:".root")
-	c.Print("./Centers"+prodString+:".png")
+	c.Print("./Centers"+prodString+".root")
+	c.Print("./Centers"+prodString+".png")
 
 
