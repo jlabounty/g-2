@@ -187,3 +187,20 @@ def GetAxis(n,h):
     else:
         raise ValueError("Axis out of range")
 
+
+def TF1toPython(func, xmin, xmax, nbins = 1000):
+    '''
+        returns array of points in x and y to be plotted in matplotlib
+    '''
+    import ROOT as r
+    import numpy as np
+
+    if( "ROOT.TF1" not in str(type(func))):
+        raise TypeError("ERROR: func is not of type TF1")
+    xs = []
+    ys = []
+    for xi in np.linspace(xmin, xmax, nbins):
+        xs.append(xi)
+        ys.append( func.Eval(xi) )
+
+    return (xs, ys)
