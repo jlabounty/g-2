@@ -17,21 +17,31 @@ class PileupCorrector:
             iteration (int): how many times has this gone through the correction algorithm
     '''
 
-    fitOptions = "R"
-
     def __init__(self, h, name, iteration = 0, deltat = 2, verbosity = 0):
         self.h = h.Clone("N_initial_"+str(iteration)+"_"+name)
         self.h_y = h.ProjectionY().Clone("h_y")
         self.name = name
         self.iteration = iteration 
         self.deltat = deltat
+        self.Nfills = None
+        self.effectiveDeltaT = None #self.CalculateEffectiveDeltaT()
         self.verbosity = verbosity
+        self.fitOptions = "R"
 
         #self.rhoDouble = None 
         #self.doublePileup = None
         #self.doublePileupY = None
         #self.triplePileup = None
         #self.triplePileupY = None
+
+    def CalculateEffectiveDeltaT(self):
+        Nfills = self.Nfills
+        if(Nfills is None):
+            raise ValueError("Error: Please specify the number of fills.")
+
+        e = self.deltat / (self.h.GetXaxis().GetBinWidth(1)) * (1.0 / Nfills )
+        self.effectiveDeltaT = e
+        return e
 
     ''' Allows us to skip the step of calculating rho_double if we have one already saved '''
     def SetRhoDouble(self, h):
@@ -41,14 +51,14 @@ class PileupCorrector:
     ''' first define a function which takes a histogram and returns the quantity described in Eqn. 6.12 '''
     def rhoDoublePulse( self, E, t ):
         timeBin = self.h.GetXaxis().FindBin( t )
-        h2 = self.h.ProjectionY("h2", timeBin, timeBin)
+        h2 = self.h.ProjectionY("h2", timeBin, timeBin) #.Clone()
         
         Nbins = h2.GetNbinsX() 
         #Emin = h2.GetBinCenter(1) - h2.GetBinWidth(1)/2.0
         #Emax = h2.GetBinCenter(Nbins) + h2.GetBinWidth(Nbins)/2.0
             
         rho = 0
-        for bin in range(Nbins):
+        for bin in range(Nbins+1):
             E2 = h2.GetBinCenter(bin)
             if( E < E2 ):
                 r1 = 0
@@ -61,7 +71,7 @@ class PileupCorrector:
         
         return rho
 
-    ''' If not set, compute rho_double '''
+    ''' If not set, compute rho_double_pulse and set in histogram '''
     def ComputeRhoDouble(self):
         self.rhoDouble = self.h.Clone("h_rhoDouble_"+str(self.iteration)+"_"+self.name)
         self.rhoDouble.Reset()
@@ -126,14 +136,15 @@ class PileupCorrector:
     def fitHistDouble(self, x, p):
         rawHist = self.doublePileupY
         scaleFactor = p[0]
-        y = rawHist.GetBinContent( rawHist.FindBin(x[0]) ) * scaleFactor
+        y = rawHist.GetBinContent( rawHist.FindBin(x[0]) ) * scaleFactor #+ p[1]
         return y
 
     ''' here we fit only the double pileup and apply the correction factor to a clone of self.h '''
     def FitDoublePileupAndApplyCorrection(self):
         doublePileupFit = r.TF1("doublePileupFit", self.fitHistDouble, 3500, 6000, 1)
         doublePileupFit.SetParameter(0,1)
-        self.h_y.Fit(doublePileupFit, self.fitOptions)
+        for i in range(2):
+            self.h_y.Fit(doublePileupFit, self.fitOptions)
 
         self.doublePileupOnlyScaleFactor = doublePileupFit.GetParameter(0)
         self.h_doublePileupCorrected = self.h.Clone("h_doublePileupCorrected")
