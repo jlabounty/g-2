@@ -238,3 +238,48 @@ def TF1toPython(func, xmin, xmax, nbins = 1000):
         ys.append( func.Eval(xi) )
 
     return (xs, ys)
+
+def CompareFitParameters( fs, width = 6, names = None, verbosity = 0):
+    '''
+        Function which takes as input 1+ TF1's and compares their parameter values. 
+        If they do not have the same number of parameters, then the lower value will be looped over (for comparing 18 vs. 5 par values)
+    '''
+    import ROOT as r
+    import numpy as np
+    import math
+    import matplotlib.pyplot as plt 
+    
+    f1 = fs[0]
+    ns = [x.GetNpar() for x in fs]
+    if(names is None):
+        names = ["f"+str(i) for i in range(len(ns))]
+        
+    npar = min(ns)
+    
+    #width = 6
+    height = int(np.ceil( npar / width ) )
+
+    fig, ax = plt.subplots(height, width, figsize=(width*5,height*4))
+    for i in range(npar):
+        valsi = [ (f1.GetParameter(i), f1.GetParError(i)) for f1 in fs]
+        if(verbosity > 0):
+            print(f1.GetParName(i)," ---- ", [x for x in valsi] )
+        axi = ax[int(np.floor(i / width))][i % width]
+
+        titlei = f1.GetParName(i)
+        if("phi" in f1.GetParName(i)[:5]):
+            pars = [x[0] % 2*math.pi for x in valsi]
+            titlei += " [Modulo 2 pi]"
+        else:
+            pars = [x[0] for x in valsi]
+        parErrs = [x[1] for x in valsi]
+
+        axi.errorbar( [x for x in range(len(pars))], pars, xerr=0, yerr=parErrs, fmt="o")
+        axi.set_title(titlei)
+        plt.sca(axi)
+        plt.grid()
+        plt.xticks(np.arange(len(ns)), names)
+
+    plt.suptitle("Comparison of Fit Parameters", y=1.01, size=18)
+    plt.tight_layout()
+    plt.show()
