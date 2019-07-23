@@ -25,10 +25,15 @@ class TimeScan():
         self.StartOrEnd = startOrEnd
         self.nPar = nPar
         self.functionName = functionName
-        
+        self.nFits = 2
+
         self.parameters = []
         self.parErrors = []
+        self.chiSquare = []
         self.timesScanned = []
+        self.fixedParameters = []
+
+        self.previousBin = -1
         
         self.verbosity = 0
         
@@ -42,20 +47,40 @@ class TimeScan():
             
         fit.SetParameters(self.initialParameters)
         fit.SetParNames()
+        self.parameterNames = [fit.f.GetParName(i) for i in range(self.nPar)]
+        for (par,value) in self.fixedParameters:
+            if(value is None):
+                fit.f.FixParameter(par, fit.f.GetParameter(par))
+            else:
+                fit.f.FixParameter(par, value)
             
         return fit
 
+    def FixParameters(self, par, value = None):
+        '''
+            Function to add a parameter to the list of parameters to fix. If value = None, then the parameter 
+                will be fixed to its current value
+        '''
+        self.fixedParameters.append( (par, value) )
+
+
     def DoScan(self):
         if(self.verbosity > 0):
-            print("Performing time scan with bounds:", tLow, tHigh,"in", nScans,"steps")
+            print("Performing time scan with bounds:", self.tLow, self.tHigh,"in", self.nScans,"steps")
             
-        exactTimes = np.linspace(tLow, tHigh, nScans)
+        exactTimes = np.linspace(self.tLow, self.tHigh, self.nScans)
         binnedTimes = []
         binWidth = self.h.GetXaxis().GetBinWidth(2)
         for t in exactTimes:
             bini = self.h.GetXaxis().FindBin( t )
+            if(bini == self.previousBin):
+                continue
+            self.previousBin = bini
             binCenter = self.h.GetXaxis().GetBinCenter(bini)
             binnedTimes.append( binCenter - binWidth )
+
+        if(self.verbosity > 0):
+            print("Times: ", binnedTimes)
             
         for timei in binnedTimes:
             if(self.verbosity > 0):
@@ -64,7 +89,7 @@ class TimeScan():
             
             fit = self.BuildFitter(timei)
             
-            fitter = WiggleFitter(self.h, fit, "StartTimeScan", "REMB", 2)
+            fitter = WiggleFitter(self.h, fit, "StartTimeScan", "REMB", self.nFits)
             
             #fit the histogram
             fitter.Fit( self.verbosity )
@@ -72,9 +97,10 @@ class TimeScan():
             #extract the parameters and append to self.[] variables
             parsi = fitter.DumpParameters()
             pi, pei = zip(*parsi)
-            self.parameters.append( pi )
-            self.parErrors.append( pei )
+            self.parameters.append( list(pi) )
+            self.parErrors.append( list(pei) )
             self.timesScanned.append( timei )
+            self.chiSquare.append( list( (fitter.f.GetChisquare(), fitter.f.GetNDF()) ) )
         
     def PlotStartTimeScan(self, par, name):
         pars = [x[par] for x in self.parameters]
