@@ -77,11 +77,34 @@ class SaveToRootFile():
             item = self.items[i]
             if(self.verbosity > 0):
                 print(key, item)
+
             if(item is None):
                 #do nothing
                 continue
-            elif(isinstance(item, int) or isinstance(item, float) or isinstance(item, list)):
+
+            elif(isinstance(item, int) or isinstance(item, float)):
                 self.CreateBranchFloat( key, item, t )
+                #r.gROOT.cd()
+
+            elif( isinstance(item, list) ):
+                if( len(item) > 0 ):
+                    #loop and get type of the most nested element of list
+                    depth = self.depth(item)
+                    #print(depth)
+                    isFloatOrInt = "item"
+                    for i in range(depth):
+                        isFloatOrInt += "[0]"
+                    itemNested = eval(isFloatOrInt)
+                    #print(itemNested)
+                    #if most nested element is a int/float, then create a branch
+                    if(isinstance(itemNested, int) or isinstance(itemNested, float)):
+                        self.CreateBranchFloat( key, item, t )
+                    elif( isinstance(item[0], str) ):
+                        for i, itemi in enumerate(item):
+                            stri = r.TNamed(key+"_"+str(i),itemi)
+                            stri.Write()
+                    else:
+                        print("This type of list is not supported:", item)
                 #r.gROOT.cd()
 
             elif( isinstance(item, str) ):
@@ -122,21 +145,32 @@ class SaveToRootFile():
         self.file.cd()
         self.file.Write()
         self.file.Close()
+
+    def depth(self, l):
+        if isinstance(l, list):
+            return 1 + max(self.depth(item) for item in l)
+        else:
+            return 0
         
     def CreateBranchFloat( self, key, item, t ):
         from array import array
         length = 0
         if(isinstance(item, list)):
             length = len(item)
-            if(isinstance(item[0], list)):
-                for i in range(len(item)):
-                    self.CreateBranchFloat( key+"_"+str(i), item[i], t )
+            if(length == 0):
                 return
+            else:
+                #print(length, item)
+                if( isinstance(item[0], list) ):
+                    for i in range(len(item)):
+                        self.CreateBranchFloat( key+"_"+str(i), item[i], t )
+                    return
             
         ni = array( 'f', [ 0 for x in range(length+1) ] )
         if(length > 0):
             for i in range(length):
-                ni[i] = item[i]
+                #print(ni, list(item)[i])
+                ni[i] = list(item)[i]
         else:
             ni[0] = item
             
