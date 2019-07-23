@@ -207,7 +207,7 @@ class PileupCorrector:
                 #print(rhoi)
                 self.triplePileup.SetBinContent(binx,biny,rhoi)
 
-        self.triplePileupY = self.triplePileup.ProjectionY("", ,self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("triplePileupY")
+        self.triplePileupY = self.triplePileup.ProjectionY("", self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("triplePileupY")
 
     def fitHistTriple(self, x, p):
         rawHistDouble = self.doublePileupY
@@ -247,6 +247,36 @@ class PileupCorrector:
         print("Correction completed! Final histogram stored in h_pileupCorrected")
 
 
+def PlotPileupSpectrum(hists, scaleFactors, names, title = None):
+    import ROOT as r
+    c = r.TCanvas("c","c",1200,900)
+
+    invHists = []
+    leg = r.TLegend(0.7,0.6,0.9,0.9)
+    for i, hi in enumerate(hists):
+        if(title is not None):
+            hi.SetTitle(title)
+        hi.Scale(scaleFactors[i])
+        leg.AddEntry(hi,names[i],"l")
+        if(i == 0):
+            hi.SetLineColor(9)
+            hi.DrawCopy("hist")
+        else:
+            hi.SetLineColor(i+1)
+            hi.DrawCopy("hist same")
+            hiInv = hi.Clone(str(i))
+            for j in range(hiInv.GetNbinsX()+1):
+                hiInv.SetBinContent(j, hiInv.GetBinContent(j)*(-1))
+            hiInv.SetLineStyle(8)
+            invHists.append(hiInv)
+            leg.AddEntry(hiInv, names[i]+" [Inverted]", "l")
+            hiInv.DrawCopy("hist same")
+            
+    leg.Draw()
+    
+    c.SetLogy()
+    c.Draw()
+    return (c, leg)
 
 def GetTH2FromTH3( h3, caloNum ):
     '''
