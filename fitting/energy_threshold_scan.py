@@ -20,7 +20,7 @@ class EnergyThresholdScan:
             Plot of the error in any parameter vs. the bin center
     '''
 
-    def __init__(self, h, eLow, eHigh, deltaE, binOrEnergy = "energy", caloNum = 0, upperOrLower = "lower", verbosity = 0):
+    def __init__(self, h, eLow, eHigh, deltaE, binOrEnergy = "energy", caloNum = 0, upperOrLower = "lower", verbosity = 0, nFit = 1):
         self.h = h.Clone()
         self.eLow = eLow
         self.eHigh = eHigh
@@ -28,6 +28,7 @@ class EnergyThresholdScan:
         self.calo = caloNum
         self.initialParameters = None
         self.inflectionPoint = [None for x in range(5)]
+        self.nFit = nFit
 
         self.eBinLow = h.GetYaxis().FindBin(self.eLow)
         self.eBinHigh = h.GetYaxis().FindBin(self.eHigh)
@@ -50,7 +51,12 @@ class EnergyThresholdScan:
         for ebin in self.whichBins:
             if(self.verbosity > 0):
                 print("    Starting bin", ebin)
-            parsi = self.DoWiggleFit(ebin, self.eBinHigh)
+            if(self.upperOrLower == "lower"):
+                parsi = self.DoWiggleFit(ebin, self.eBinHigh)
+            elif(self.upperOrLower == "upper"):
+                parsi = self.DoWiggleFit(self.eBinLow, ebin)
+            else:
+                raise ValueError("ERROR: select upper or lower energy scan")
             
             pi, pei = zip( *parsi )
             self.parameters.append(pi)
@@ -72,7 +78,7 @@ class EnergyThresholdScan:
 
         self.parNames = ( [x for x in fit.nameDict['5par'] ] )
         
-        fitter = WiggleFitter(wiggle.h, fit, "5par", "REMBQ", 2)
+        fitter = WiggleFitter(wiggle.h, fit, "5par", "REMBQ", self.nFit)
         fitter.Fit( self.verbosity )
 
         return fitter.ReturnParameters()
@@ -93,6 +99,7 @@ class EnergyThresholdScan:
             elif(self.upperOrLower == "upper" ):
                 if((boundi >= self.eHigh - self.deltaE) and (boundi <= self.eHigh + self.deltaE)):
                     self.whichBins.append(i)
+                    self.whichBinEnergies.append( self.h.GetYaxis().GetBinCenter(i) )
             else:
                 raise ValueError("ERROR: upperOrLower is not well defined")
             self.energyBinLowerBounds.append( boundi )
