@@ -119,7 +119,7 @@ class PileupMultiplierScan():
                 self.parErrors.append(pei)
                 self.chiSq.append( fitter.f.GetChisquare() / fitter.f.GetNDF() )
                 
-    def SinglePointGetWiggle(self, dM, tM):
+    def SinglePointGetWiggle(self, dM, tM, th2 = False):
         self.eBinLow = self.Ninitial.GetYaxis().FindBin(self.eLow)
         self.eBinHigh = self.Ninitial.GetYaxis().FindBin(self.eHigh)
         print("Beginning scan point: ", dM, tM)
@@ -135,7 +135,10 @@ class PileupMultiplierScan():
 
         hi_x = hi.ProjectionX("", self.eBinLow, self.eBinHigh).Clone("hi_x")
         
-        return hi_x 
+        if(th2):
+            return hi
+        else:
+            return hi_x 
                 
     def PlotParameterVsDouble(self, i, title = None, mult = 0, chiSq = False):
         pars = [ self.parameters[x][i] for x in range(len(self.parameters))]
