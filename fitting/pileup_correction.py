@@ -17,9 +17,12 @@ class PileupCorrector:
             iteration (int): how many times has this gone through the correction algorithm
     '''
 
-    def __init__(self, h, name, iteration = 0, deltat = 2, verbosity = 0):
+    def __init__(self, h, name, iteration = 0, deltat = 2, verbosity = 0, tFitLow = 30):
         self.h = h.Clone("N_initial_"+str(iteration)+"_"+name)
-        self.h_y = h.ProjectionY().Clone("h_y")
+        self.pileupFitEbinLow = self.h.GetYaxis().FindBin(self.tFitLow)
+        self.tFitLow = tFitLow
+        self.pileupFitEbinHigh = -1
+        self.h_y = h.ProjectionY("",self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("h_y")
         self.name = name
         self.iteration = iteration 
         self.deltat = deltat
@@ -71,7 +74,7 @@ class PileupCorrector:
         
         return rho
 
-    ''' If not set, compute rho_double_pulse and set in histogram '''
+    ''' If not set, compute rho_double_pulse for each bin and set in histogram '''
     def ComputeRhoDouble(self):
         self.rhoDouble = self.h.Clone("h_rhoDouble_"+str(self.iteration)+"_"+self.name)
         self.rhoDouble.Reset()
@@ -130,7 +133,7 @@ class PileupCorrector:
                 rhoi = self.rhoDoublePileup(Ei, ti)
                 #print(rhoi)
                 self.doublePileup.SetBinContent(binx,biny,rhoi)
-        self.doublePileupY = self.doublePileup.ProjectionY().Clone("doublePileupY")
+        self.doublePileupY = self.doublePileup.ProjectionY("",self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("doublePileupY")
 
     ''' fit histogram using method here https://root.cern.ch/root/html/tutorials/fit/fithist.C.html '''
     def fitHistDouble(self, x, p):
@@ -204,7 +207,7 @@ class PileupCorrector:
                 #print(rhoi)
                 self.triplePileup.SetBinContent(binx,biny,rhoi)
 
-        self.triplePileupY = self.triplePileup.ProjectionY().Clone("triplePileupY")
+        self.triplePileupY = self.triplePileup.ProjectionY("", ,self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("triplePileupY")
 
     def fitHistTriple(self, x, p):
         rawHistDouble = self.doublePileupY
