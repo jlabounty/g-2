@@ -839,6 +839,94 @@ def fourierXformWiggle( wigglePlot, inputFit, fitBoundLow, fitBoundHigh, title )
     
     return hxform
 
+# performs a fourier transform on the residuals from a plot.
+def fourierXformWiggle_HistOnly( wigglePlot, fitBoundLow, fitBoundHigh, title ):
+    '''
+        Computes fourier transform of a given histogram within the given bounds. Input is just fit residuals.
+        Assumes input X-axis is in microseconds
+    '''
+
+    c3 = r.TCanvas()
+    residualsFull_5Param = wigglePlot.Clone() 
+    nBins = residualsFull_5Param.GetSize() - 2 #total number of bins excluding over/underflow
+    #print(nBins)
+    residVec = []
+    for i in range(nBins):
+        binCenterX = wigglePlot.GetXaxis().GetBinCenter(i)
+        if (binCenterX > fitBoundLow and binCenterX < fitBoundHigh):
+            residVec.append( (binCenterX, wigglePlot.GetBinContent(i) ) )
+        else:
+            residualsFull_5Param.SetBinContent(i, 0)
+
+    #print(len(residVec),[residVec[i] for i in range(5)])
+    centers, bins = zip(*residVec)
+    htest = r.TH1D("htest","htest",len(residVec),centers[0],centers[len(residVec)-1])
+    for i,ding in enumerate(bins):
+        htest.SetBinContent(i, ding)
+
+    #residualsFull_5Param.Delete()
+    residualsFull_5Param = htest
+    nBins = residualsFull_5Param.GetSize() - 2 #total number of bins excluding over/underflow
+
+    #apply a windows function to try to get rid of the imaginary peaks
+    welchVec = []
+    for i in range(nBins):
+        unwindowed = residualsFull_5Param.GetBinContent(i)
+        welch = 1 #- ( ( i - (nBins - 1) / 2) / ((nBins - 1) / 2) )**2
+        welchVec.append(welch)
+        residualsFull_5Param.SetBinContent(i, unwindowed *  welch)
+
+    residualsFull_5Param.Draw()
+    residualsFull_5Param.GetXaxis().SetRangeUser(30,700)
+    residualsFull_5Param.SetTitle("(Windowed) Residuals of the Fit")
+    c3.Draw()    
+
+    hxform = r.TH1D()
+    hxform = 0
+    r.TVirtualFFT.SetTransform(0)
+    hxform = residualsFull_5Param.FFT(hxform,"MAG P")
+    hxform.SetTitle( title )
+    #NOTE: for "real" frequencies you have to divide the x-axes range with the range of your function
+    #    y-axes has to be rescaled by a factor of 1/SQRT(n) to be right: this is not done automatically!
+    normXform = hxform.GetEntries()
+    hxform.Scale(1/normXform)
+    c2 = r.TCanvas()
+    c2.cd()
+    #c2.SetLogy()
+    hxform.GetXaxis().SetTitle("Frequency (MHz)")
+    hxform.GetYaxis().SetTitle("Arb. Units")
+    hxform.Draw("HIST P0 L")
+    #c2.Draw()
+
+    Npart = residualsFull_5Param.GetSize() - 2
+    minBinCenter = residualsFull_5Param.GetXaxis().GetBinCenter(0)
+    maxBinCenter = residualsFull_5Param.GetXaxis().GetBinCenter(Npart)
+
+    capT = maxBinCenter - minBinCenter
+    #print(Npart, capT, minBinCenter, maxBinCenter)
+    deltaT = capT/Npart #microseconds
+    #deltaF = 1/capT
+    #print(deltaT, deltaF)
+
+    deltaTns = deltaT*1000 #nanoseconds
+    limmaxHz = (1/(deltaTns*math.pow(10.0,-9)))
+    limmaxMHz = limmaxHz / math.pow(10.0,6)
+
+    #limmax = 2*deltaF*Npart #400-25
+    #print(limmax,limmaxMHz)
+    #hxform.GetXaxis().SetLimits(0,limmax)
+    #nbins = residualsFull_5Param.GetSize() - 2
+    hxform.SetBins(Npart,0,limmaxMHz)
+    hxform.GetXaxis().SetRangeUser(0,limmaxMHz/2)
+    #hxform.GetXaxis().SetRangeUser(0,1.4)
+
+    #c2.SetLogy()
+    #c2.Draw()
+    #c2.Print("./images/FullIslands_5ParamResiduals.png")
+    #c2.Print("./images/FullIslands_5ParamResiduals.root")
+    
+    return hxform
+
 
 def InitializeWiggleFitterFromFile( fileName ):
     '''
