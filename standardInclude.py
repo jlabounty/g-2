@@ -196,7 +196,7 @@ def toFlatMap( crystalsInCluster ):
 
 
 #takes two maps and overlays them with imshow
-def imshowCompare(vec1, vec2, showPlot = True, savePlot = True, titleString = ''):
+def imshowCompare(vec1, vec2, showPlot = True, savePlot = True, titleString = '', ylabels = ['East Only', 'Both', 'West Only']):
     vec3 = []
     for i in range(len(vec1)):
         vec3i = []
@@ -231,7 +231,7 @@ def imshowCompare(vec1, vec2, showPlot = True, savePlot = True, titleString = ''
                         ticks=[x + 0.5 for x in bounds],
                         orientation='vertical')
     cbar.ax.set_xticklabels(['Low', 'Medium', 'High'])  # horizontal colorbar
-    cbar.ax.set_yticklabels(['East Only', 'Both', 'West Only'])
+    cbar.ax.set_yticklabels(ylabels)
         
     if(savePlot):
         plt.savefig("./images/CrystalHits_"+str(titleString)+".png",bbox_inches='tight')
@@ -945,3 +945,51 @@ def getResiduals( wigglePlot, fitFunction, fitBoundLow, fitBoundHigh, title ):
     return residualsFull_5Param;
 
 
+def plotRingComponents(y = 0.5):
+    plt.plot([4,7],[y,y],'r',label="Kicker Region")
+    plt.plot([1,4],[y,y],'b',label="Q1")
+    plt.plot([7,10],[y,y],'b',label="Q2")
+    plt.plot([13,16],[y,y],'b',label="Q3")
+    plt.plot([19,22],[y,y],'b',label="Q4")
+    plt.plot([12,13],[y,y],'brown',label="Tracker")
+    plt.plot([18,19],[y,y],'brown',label="Tracker")
+    plt.plot([23,24],[y,y],'black',label="Inflector")
+    
+    
+def PlotCrystals( values, sizex=10, sizey=6, showValues = True, title=""):
+    '''
+        Takes as input a vector of len(54) and plots it as a calorimeter. Includes proper labelling of crystals.
+        Can plot a list of list, but the first item in each sublist must be an int.
+    '''
+    if(len(values) != 54):
+        print("ERROR: Input does not have length 54.")
+        return -1
+    values_imshowFormat = [[999999999 for j in range(9)] for i in range(6)]
+    for sipm, value in enumerate(values):
+        if(type(value) == list):
+            values_imshowFormat[int(np.floor(sipm/9))][sipm % 9] = value[0]
+        else:
+            values_imshowFormat[int(np.floor(sipm/9))][sipm % 9] = value
+                
+    fig,ax = plt.subplots(figsize=(sizex, sizey))
+    plt.imshow(values_imshowFormat, origin='lower')  
+    
+    ax.set_xticks(np.arange(-.5, 9, 1))
+    ax.set_yticks(np.arange(-.5, 5, 1))
+    ax.set_xticklabels(np.arange(0, 12, 1))
+    ax.set_yticklabels(np.arange(0, 12, 1))
+    
+    plt.title(title)
+    
+    if(showValues):
+        for (j,i),label in np.ndenumerate(values_imshowFormat):
+            #ax.text(i,j,label,ha='center',va='center')
+            ax.text(i,j, values[j*9 + i],ha='center',va='center') #hack to make the list functionality not suck
+    
+    plt.grid()
+    
+    plt.xlabel("Crystal 0 = Bottom Left")
+    
+    plt.colorbar()               
+    return (fig, ax)
+    #plt.show()
