@@ -83,7 +83,8 @@ void FWanalysis(std::string fileName = "run2Equalization/run2Iteration4.root", i
 			}
 		}
 
-		if(i != 758){ //758 = dead crystal.
+		if( tempGraph->GetN() > 0){ 
+		//if(i != 758){ //758 = dead crystal.
 		//if(i != 421 and i !=758){
 		//if(i != 422 and i !=758){
 			std::cout<<"Entries: " << tempGraph->GetN() << std::endl;
