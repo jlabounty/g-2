@@ -993,3 +993,25 @@ def PlotCrystals( values, sizex=10, sizey=6, showValues = True, title=""):
     plt.colorbar()               
     return (fig, ax)
     #plt.show()
+    
+def flatten2dArray(input):
+    new_list = []
+    for i in input:
+        for j in i:
+            new_list.append(j)
+    return new_list
+
+
+def createSamDataset(name, runs, extraConditions = "", dataType = 'raw'):
+    '''
+	Outputs a string which will create a SAM dataset with the given name.
+    '''
+    dataset = 'samweb -e gm2 create-definition '+str(name)+' " ( '
+    for i, runi in enumerate(runs):
+        dataset+= "( run_number >= "+str(runi)+" and run_number <= "+str(runi)+" ) or "
+    dataset = dataset[:-3]+" "
+    if(len(extraConditions) > 0):
+        dataset += ' and ( '+str(extraConditions)+' ) '
+    dataset += ') and data_tier '+str(dataType)+' " '
+    
+    return dataset
