@@ -1010,7 +1010,8 @@ def createSamDataset(name, runs, extraConditions = "", dataType = 'raw'):
     '''
     dataset = 'samweb -e gm2 create-definition '+str(name)+' " ( '
     for i, runi in enumerate(runs):
-        dataset+= "( run_number >= "+str(runi)+" and run_number <= "+str(runi)+" ) or "
+        #dataset+= "( run_number >= "+str(runi)+" and run_number <= "+str(runi)+" ) or "
+        dataset+= "( run_number = "+str(runi)+" ) or "
     dataset = dataset[:-3]+" "
     if(len(extraConditions) > 0):
         dataset += ' and ( '+str(extraConditions)+' ) '
@@ -1093,3 +1094,115 @@ def fclWriter(fclDict, fileName, comment = ""):
         printDictInFcl(fclDict, file)   
         file.writelines(["END_PROLOG","\n"])
     file.close()
+    
+    
+def THnToPython(h):
+    '''
+        Creates a dictionary structure to hold the THn in Python
+    '''
+    histDict = {}
+    histType = str(type(h))
+    #print(histType)
+    if("ROOT.TH") not in histType:
+        print("ERROR: Not a ROOT THn Object")
+        return -1
+    histDimension = int(histType.split("ROOT.TH")[1].split("'")[0][0])
+    histDataType = histType.split("ROOT.TH")[1].split("'")[0][1]
+    #print(histDimension, histDataType)
+    histDict['dimension'] = histDimension
+    histDict['dataType'] = histDataType
+    histDict['name'] = h.GetName()
+    histDict['title'] = h.GetTitle()
+    axisNames = ['X', 'Y', 'Z']
+    allBins = []
+    
+    #store axes ranges
+    for axi in range(histDimension):
+        axDict = {}
+        ax = eval("h.Get"+axisNames[axi]+"axis()")
+        #print(ax)
+        bins = ax.GetNbins()
+        centers = []
+        widths = []
+        for i in range(1,bins+1):
+            centers.append( ax.GetBinCenter(i) )
+            widths.append( ax.GetBinWidth(i) )
+        #print(bins, centers, widths)
+        axDict['axis'] = axisNames[axi]
+        axDict['title'] = ax.GetTitle()
+        axDict['range'] = [ax.GetBinCenter(1) - ax.GetBinWidth(1)/2., 
+                           ax.GetBinCenter(bins) + ax.GetBinWidth(bins)/2.]
+        axDict['bins'] = bins
+        axDict['centers'] = centers
+        axDict['widths'] = widths
+        allBins.append(bins)
+        
+        histDict["ax"+str(axi)] = axDict
+    
+    #get global bin numbers
+    #[(a, b, c) for a in A for b in B for c in C]
+    evalString = ["[ [ ","]  "]
+    for i, bini in enumerate(allBins):
+        evalString[0] += axisNames[i]+", "
+        evalString[1] += "for "+axisNames[i]+" in range(1,"+str(bini+1)+") "
+    evalString = evalString[0][:-2]+evalString[1]+" ]"
+    #print(evalString)
+    allBinsNumbers = eval(evalString)
+    #print(allBinsNumbers)
+    #print(eval("h.GetBin("+str(allBinsNumbers[0])[1:-1]+")"))
+    globalBinNumbers = []
+    for x in allBinsNumbers:
+        #print(x)
+        globalBinNumbers.append(eval("h.GetBin("+str(x)[1:-1]+")")) 
+    #print(globalBinNumbers)
+    
+    #store bin contents
+    binDict = {}
+    for i, bini in enumerate(globalBinNumbers):
+        content = h.GetBinContent(bini)
+        error = h.GetBinError(bini)
+        
+        if(content > 0 or content < 0 ):
+            biniDict = {}
+            biniDict['content'] = content
+            biniDict['error'] = error
+            biniDict['binNumbers'] = allBinsNumbers[i]
+
+            binDict[bini] = biniDict
+        
+    histDict['binContents'] = binDict
+    
+    return histDict
+
+def CreateTHn(histDict, name=None):
+    
+    dimension = histDict['dimension']
+    dataType = histDict['dataType']
+    title = histDict['title']
+    if(name is None):
+        name = histDict['name']
+    axPars = []
+    for i in range(dimension):
+        axi = [histDict["ax"+str(i)]['bins'],
+               histDict["ax"+str(i)]['range'][0],
+               histDict["ax"+str(i)]['range'][1]]
+        axPars.append(axi)
+    #print(axPars)
+    
+    histString = "r.TH"+str(dimension)+str(dataType)+"( '"+str(name)+"', '"+str(title)+"'"
+    for axi in axPars:
+        histString += ", "+str(axi[0])+", "+str(axi[1])+", "+str(axi[2])
+    histString += " )"
+    #print(histString)
+    h = eval(histString)
+    for i in range(dimension):
+        eval("h.Get"+histDict['ax'+str(i)]['axis']+"axis().SetTitle( '"+str(histDict['ax'+str(i)]['title'])+"' )")
+    
+    for bini in histDict['binContents']:
+        #print(bini, histDict['binContents'][bini]['content'])
+        content = histDict['binContents'][bini]['content']
+        error = histDict['binContents'][bini]['error']
+        h.SetBinContent(bini, content)
+        h.SetBinError(bini, error)
+    
+    return h
