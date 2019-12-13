@@ -4,8 +4,11 @@
 # In[1]:
 
 
-from standardInclude import *
-
+#from standardInclude import *
+import ROOT as r
+import numpy as np
+import random
+import math
 
 # In[2]:
 
@@ -29,13 +32,15 @@ nDists = len(distributions)
 # In[3]:
 
 
+print("Getting fast rotation...")
+
 frdists = []
 for name, run, hist_file in distributions:
     f = r.TFile("./fastRotation/CornellFourier_run"+str(run)+"_results.root")
     #f.ls()
     gri = f.Get("rad")
     frdists.append(gri.Clone("rad_"+str(name)))
-print(frdists)
+#print(frdists)
     
 
 
@@ -69,6 +74,7 @@ c.Draw()
 
 # In[27]:
 
+print("Getting loss histograms...")
 
 lossHistograms = []
 
@@ -94,18 +100,17 @@ for name, run, hist_file in distributions:
     f.Close()
 
     h_trip.Scale(1/ctag)
-    print(h_sing, h_trip)
+    #print(h_sing, h_trip)
     
     h_trip_y = h_trip.Project3D("y").Clone("h_trip_y")
     h_trip_y.SetDirectory(0)
     
     lossHistograms.append( h_trip_y.Clone("h_trip_y_"+str(name)) )
     
-print(lossHistograms)
+#print(lossHistograms)
 
 
 # In[28]:
-
 
 c = r.TCanvas()
 leg = r.TLegend(0.7,0.6,0.9,0.9)
@@ -144,9 +149,10 @@ h = r.TH2D("h","Position in FR Distribution vs. Time for Decays",
            )
 np.random.seed(1234)
 verbosity = 0
-nMuons = 100000
+nMuons = 10000000
 checkWhetherLost = True
 
+print("Starting monte carlo...")
 
 for i in range(nMuons):
     #generate a random x,t pair
@@ -189,10 +195,12 @@ for i in range(nMuons):
 
 # In[69]:
 
+print("Done! Saving...")
 
 c = r.TCanvas()
 h.Draw("colz")
 c.Draw()
+c.Print("./OutputHist.root")
 
 
 # In[70]:
@@ -211,4 +219,4 @@ c.Draw()
 
 
 
-
+print("All done...")
