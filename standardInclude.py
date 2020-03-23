@@ -24,6 +24,10 @@ import pandas
 import numpy as np
 import os
 import scipy
+import uncertainties
+
+import time
+from datetime import datetime
 
 #PyROOT
 import ROOT as r
@@ -1206,3 +1210,205 @@ def CreateTHn(histDict, name=None):
         h.SetBinError(bini, error)
     
     return h
+
+
+def TH1ToNumpyArray(h):
+    dict_h = THnToPython(h)
+    #print(dict_h.keys())
+    #print(dict_h['binContents'].keys())
+    ys = []
+    yerrs = []
+    xs = dict_h['ax0']['centers']
+    for i in range(dict_h['ax0']['bins']):
+        try:
+            ys.append(dict_h['binContents'][i]['content'])
+            yerrs.append(dict_h['binContents'][i]['error'])
+        except:
+            ys.append(0)
+            yerrs.append(0)
+        
+    return(xs, ys, yerrs)
+
+def TH2ToNumpyArray(h):
+    dict_h = THnToPython(h)
+    #print(dict_h.keys())
+    #print(dict_h['binContents'].keys())
+    dimension = dict_h['dimension']
+    if(dimension is not 2):
+        return -1
+    bins = []
+    extent = []
+    for ax in range(dimension):
+        bins.append( dict_h['ax'+str(ax)]['bins'] )
+        extent.append( dict_h['ax'+str(ax)]['range'][0] )
+        extent.append( dict_h['ax'+str(ax)]['range'][1] )
+    print(bins)
+    
+    histarray = [[np.nan for i in range(bins[0])] for j in range(bins[1])]
+    
+    
+    for xbin in range(bins[0]):
+        for ybin in range(bins[1]):
+            bini = h.GetBin(xbin, ybin)
+            if bini in dict_h['binContents'].keys():
+                contenti = dict_h['binContents'][bini]['content']
+            else:
+                contenti = 0
+            histarray[ybin][xbin] = contenti
+    
+    ding = plt.imshow(histarray,aspect='auto',origin='lower',extent=extent)
+    
+    return ding, histarray
+
+def THnToNumpyArray(h):
+    histType = str(type(h))
+    if("TH1" in histType):
+        return TH1ToNumpyArray(h)
+    elif("TH2" in histType):
+        return TH2ToNumpyArray(h)
+    elif("TH3" in histType):
+        print("TH3 Not implemented")
+    else:
+        print("ERROR: Type", histType, "not implemented")
+        
+def arrayToTGraph(ys, xs = None):
+    if(('list' not in str(type(ys))) and ('numpy.ndarray' not in str(type(ys)) )):
+        print("Error: wrong type.")
+        return -1
+    ys = list(ys)
+    if(xs is None):
+        xs = [x for x in range(len(ys))]
+    if(len(xs) != len(ys)):
+        print("ERROR: x and y have different lengths")
+        return -1
+        
+    gr = r.TGraph()
+    for i in range(len(ys)):
+        gr.SetPoint(i, xs[i], ys[i])
+    return gr
+
+
+def stringToListOfFloats( string, verbosity = 0 ):
+    '''
+        Converts a list of floats stored in a string into a list of floats. Useful for dataframes.
+    '''
+    ding = [float(x) for x in string[1:-1].split(",")]
+    if(verbosity > 0):
+        print(ding)
+    return(ding)
+
+
+def fitVector(x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit = 2, function_python=None):
+    '''
+        Dumps a python vector of x and y points into a TGraph, then fits with the TF1 function and returns the fit result
+    '''
+    
+    x = list(x)
+    y = list(y)
+    if(xerr is not None):
+        xerr = list(xerr)
+        yerr = list(yerr)
+    
+    fnew = function#.Clone()
+    gri = r.TGraphErrors()
+    for i in range(len(x)):
+        if("Timestamp" in str(type(x[i]))):
+            x[i] = int(time.mktime(x[i].timetuple()))
+        gri.SetPoint(i,x[i],y[i])
+        #print(x[i], y[i])
+        if(xerr is not None):
+            gri.SetPointError(i, xerr[i], yerr[i])
+    for i in range(nFit):
+        fitresult = gri.Fit(fnew, fitoptions+"S")
+        
+    cov = fitresult.GetCovarianceMatrix()
+    #conf_int = r.Double()
+    if (len(x) == len(fitresult.GetConfidenceIntervals(0.95))):
+        conf_int = [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
+    else:
+        #conf_int = [0 for i in range(len(x))]
+        conf_int = [ len(fitresult.GetConfidenceIntervals(0.95)), 
+                    [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
+        
+    #get the fit parameters and associated errors
+    pars = []
+    parErrs = []
+    for i in range(fnew.GetNpar()):
+        pars.append( fnew.GetParameter(i) )
+        parErrs.append( fnew.GetParError(i) )
+    chiSq = (fnew.GetChisquare() / fnew.GetNDF())
+        
+    #create a vector of y-points at each of the x points with the fitted function
+    fitx = []
+    for xi in x:
+        fitx.append(fnew.Eval(xi))
+    #print("hi")
+    return(fitx, (pars, parErrs), chiSq, gri, fnew, cov, conf_int)
+
+def TF1toVector( func, xlow, xhigh, npoints ):
+    yvec = []
+    xvec = []
+    for i in np.linspace(xlow, xhigh, npoints):
+        xvec.append(i)
+        yvec.append(func.Eval(i))
+    return(xvec, yvec)
+
+def covarianceMatrixToPython( cov ):
+    nrows = cov.GetNrows()
+    ncols = cov.GetNcols()
+    
+    array = np.zeros([nrows, ncols])
+    for i in range(nrows):
+        for j in range(ncols):
+            xi = cov[i][j]
+            array[i][j] = xi
+    
+    return array
+
+def corellationMatrixFromCovariance( cov ):
+    ni = len(cov)
+    nj = len(cov[0])
+    #print(ni,nj)
+    
+    array = np.zeros([ni,nj])
+    
+    for i in range(ni):
+        for j in range(nj):
+            array[i][j] = cov[i][j]/(np.sqrt(cov[i][i]) * np.sqrt(cov[j][j])) #https://www.mathworks.com/help/symbolic/mupad_ref/stats-correlationmatrix.html
+    return array
+
+def labelFit(pars, parErrs, parNames=None, chiSquare = None, functionString=None, formatStr="7.3E"):
+    if(parNames is None):
+        parNames = ["p"+str(i) for i in range(len(pars))]
+    parstring = "Fit Result"+"\n"
+    if(functionString is not None):
+        parstring+="Function: "+functionString+"\n"
+    for i in range(len(pars)):
+        parstring += str(parNames[i])+"\t= "+str(format(pars[i], formatStr))
+        if(parErrs is not None):
+            parstring += "\t"+r"$\pm$ "+str(format(parErrs[i], formatStr))+"\n"
+        else:
+            parstring += "\n"
+    if(chiSquare is not None):
+        parstring += r"$\chi^{2}/NDF$ = "+str(chiSquare)
+        
+    return parstring
+
+def drawConfidenceIntervals( ax, xvals, fitresult, color='blue',labeli=None, drawHist=True):
+    if(len(fitresult[6]) is not 2):
+        conf_int_high = [x+y for (x,y) in zip(fitresult[0], fitresult[6])]
+        conf_int_low = [x-y for (x,y) in zip(fitresult[0], fitresult[6])]
+
+        xvals_sorted, conf_int_high_sorted = zip(*sorted(zip(xvals, conf_int_high)))
+        xvals_sorted, conf_int_low_sorted = zip(*sorted(zip(xvals, conf_int_low)))
+
+        #ax.plot(xvals_sorted, conf_int_high_sorted)
+        #ax.plot(xvals_sorted, conf_int_low_sorted)
+        if(drawHist):
+            ax.fill_between(xvals_sorted, conf_int_high_sorted, conf_int_low_sorted,
+                           facecolor=color, interpolate=True,
+                           alpha = 0.2,
+                           label=labeli)
+        return( xvals_sorted, conf_int_high_sorted, conf_int_low_sorted )
+    else:
+        print("ERROR: Confidence interval length does not match data length")
