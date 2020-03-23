@@ -9,10 +9,25 @@ import ROOT as r
 import numpy as np
 import random
 import math
+import sys
 
 # In[2]:
 
+positionBounds = [-30,30] #mm
+timeBounds = [20,300] #mus
+positionBins = 1000
+timeBins = 1000
 
+seed = int(sys.argv[1])
+np.random.seed(seed)
+print("Setting random seed:", seed)
+
+verbosity = 0
+nMuons = 9000000
+checkWhetherLost = True
+lossProbabilityMultiplier = 100000
+
+'''
 distributions = [ #['nominal', 30445, 'ding'], #name, fr run, root file
                   #['half_high', 30464, 'ding'],
                   #['half_low', 30466, 'ding'],
@@ -21,6 +36,16 @@ distributions = [ #['nominal', 30445, 'ding'], #name, fr run, root file
                   ['fifth_high', 30475, 'results_fifthCtag_highMomentum.root'],
                   ['fifth_low', 30479, 'results_fifthCtag_lowMomentum.root']
                   #['fifth_middle', 30483, 'ding']
+                ]
+'''
+distributions = [ #['nominal', 30445, 'ding'], #name, fr run, root file
+                  ['half_high', 30464, 'highMom_half_hists.root'],
+                  ['half_low', 30466, 'lowMom_half_hists.root'],
+                  ['third_high', 30468, 'highMom_third_hists.root'],
+                  ['third_low', 30472, 'lowMom_third_hists.root'],
+                  ['fifth_high', 30475, 'highMom_fifth_hists.root'],
+                  ['fifth_low', 30479, 'lowMom_fifth_hists.root'],
+                  ['fifth_middle', 30483, 'midMom_fifth_hists.root']
                 ]
 
 nDists = len(distributions)
@@ -66,6 +91,7 @@ for i in range(nDists):
     leg.AddEntry(frdists[i], distributions[i][0],"l")
 leg.Draw("SAME")
 c.Draw()
+c.Print("./FR_Hist_"+str(seed)+"_"+str(nMuons)+"_"+str(lossProbabilityMultiplier)+".root")
 
 
 # ---
@@ -82,9 +108,11 @@ for name, run, hist_file in distributions:
     f = r.TFile("./muonLoss/"+hist_file)
     #f.ls()
     
-    h_sing = f.Get("CoincidenceFinderLM/clusterTimecaloNumsingle_").Clone("h_sing")
+    #h_sing = f.Get("CoincidenceFinderLM/clusterTimecaloNumsingle_").Clone("h_sing")
+    h_sing = f.Get("nearlineCTag").Clone("h_sing")
     h_sing.SetDirectory(0)
-    h_tripi = f.Get("CoincidenceFinderLM/clusterTimecaloNumtriple_").Clone("h_tripi")
+    #h_tripi = f.Get("CoincidenceFinderLM/clusterTimecaloNumtriple_").Clone("h_tripi")
+    h_tripi = f.Get("clusterTimecaloNumtriple_").Clone("h_tripi")
     h_tripi.SetDirectory(0)
     
     h_trip = r.TH3D()
@@ -95,7 +123,8 @@ for name, run, hist_file in distributions:
     #print(h_tripi.GetEntries(), h_tripi.Integral())
     #print(h_trip.GetEntries(), h_trip.Integral())
     
-    ctag =  h_sing.Project3D("y").Integral(h_sing.GetYaxis().FindBin(24000), -1)
+    #ctag =  h_sing.Project3D("y").Integral(h_sing.GetYaxis().FindBin(24000), -1)
+    ctag =  h_sing.Integral()
     #print(ctag)
     f.Close()
 
@@ -127,6 +156,7 @@ for i in range(nDists):
 leg.Draw("SAME")
 c.SetLogy()
 c.Draw()
+c.Print("./LossHists_Hist_"+str(seed)+"_"+str(nMuons)+"_"+str(lossProbabilityMultiplier)+".root")
 
 
 # ---
@@ -138,24 +168,18 @@ c.Draw()
 # In[68]:
 
 
-positionBounds = [-20,40] #mm
-timeBounds = [0,300] #mus
-positionBins = 100
-timeBins = 100
 
-h = r.TH2D("h","Position in FR Distribution vs. Time for Decays",
+h = r.TH2D("h","Position in FR Distribution vs. Time for Decays From "+str(nMuons)+" Muons with Probabilities Multiplied by a Factor of "+str(lossProbabilityMultiplier),
            positionBins, positionBounds[0], positionBounds[1],
            timeBins, timeBounds[0], timeBounds[1]
            )
-np.random.seed(1234)
-verbosity = 0
-nMuons = 10000000
-checkWhetherLost = True
 
 print("Starting monte carlo...")
 
-for i in range(nMuons):
+for i in range(0,nMuons,1):
     #generate a random x,t pair
+    if( i % 1000000  == 0 ):
+        print("   Starting event", i, "....")
     if(verbosity > 0):
         print("***************************************")
     x = np.random.uniform(positionBounds[0], positionBounds[1])
@@ -181,6 +205,7 @@ for i in range(nMuons):
     #get the probability of being lost from this distribution at this time
     pLoss = lossHistograms[choice].Interpolate(t*1000./1.25) #convert microseconds to c.t.
     #pLoss = frdists[choice].Eval(x)
+    pLoss = pLoss * lossProbabilityMultiplier #scale by an adjustable probability multiplier for more statistics
     overUnder = np.random.random()
     if(verbosity > 0):
         print(x)
@@ -200,7 +225,7 @@ print("Done! Saving...")
 c = r.TCanvas()
 h.Draw("colz")
 c.Draw()
-c.Print("./OutputHist.root")
+c.Print("./OutputHist_"+str(seed)+"_"+str(nMuons)+"_"+str(lossProbabilityMultiplier)+".root")
 
 
 # In[70]:
