@@ -19,7 +19,7 @@ class PileupCorrector:
 
     def __init__(self, h, name, iteration = 0, deltat = 2, verbosity = 0, tFitLow = 30):
         self.h = h.Clone("N_initial_"+str(iteration)+"_"+name)
-        self.pileupFitEbinLow = self.h.GetYaxis().FindBin(self.tFitLow)
+        self.pileupFitEbinLow = self.h.GetYaxis().FindBin(tFitLow)
         self.tFitLow = tFitLow
         self.pileupFitEbinHigh = -1
         self.h_y = h.ProjectionY("",self.pileupFitEbinLow, self.pileupFitEbinHigh).Clone("h_y")
@@ -267,7 +267,7 @@ def PlotPileupSpectrum(hists, scaleFactors, names, title = None):
             hiInv = hi.Clone(str(i))
             for j in range(hiInv.GetNbinsX()+1):
                 hiInv.SetBinContent(j, hiInv.GetBinContent(j)*(-1))
-            hiInv.SetLineStyle(8)
+            hiInv.SetLineStyle(3)
             invHists.append(hiInv)
             leg.AddEntry(hiInv, names[i]+" [Inverted]", "l")
             hiInv.DrawCopy("hist same")

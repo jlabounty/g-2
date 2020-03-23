@@ -20,7 +20,7 @@ class EnergyThresholdScan:
             Plot of the error in any parameter vs. the bin center
     '''
 
-    def __init__(self, h, eLow, eHigh, deltaE, binOrEnergy = "energy", caloNum = 0, upperOrLower = "lower", verbosity = 0, nFit = 1):
+    def __init__(self, h, eLow, eHigh, deltaE, binOrEnergy = "energy", caloNum = 0, upperOrLower = "lower", verbosity = 0, nFit = 1, nAxes = 3):
         self.h = h.Clone()
         self.eLow = eLow
         self.eHigh = eHigh
@@ -32,7 +32,9 @@ class EnergyThresholdScan:
 
         self.eBinLow = h.GetYaxis().FindBin(self.eLow)
         self.eBinHigh = h.GetYaxis().FindBin(self.eHigh)
-        self.caloBin = h.GetZaxis().FindBin(self.calo)
+        self.nAxes = nAxes
+        if(nAxes > 2):
+            self.caloBin = h.GetZaxis().FindBin(self.calo)
 
         self.binOrEnergy = binOrEnergy
         self.upperOrLower = upperOrLower
@@ -63,7 +65,10 @@ class EnergyThresholdScan:
             self.parErrors.append(pei)
 
     def DoWiggleFit(self, e1_bin, e2_bin):
-        wiggle = MakeWiggleFromTH3(self.h, e1_bin, e2_bin, self.calo, 1, False, "bin")
+        if(self.nAxes > 2):
+            wiggle = MakeWiggleFromTH3(self.h, e1_bin, e2_bin, self.calo, 1, False, "bin")
+        elif(self.nAxes == 2):
+            wiggle = MakeWiggleFromTH2(self.h, e1_bin, e2_bin, self.calo, 1, False, "bin")
         if(self.verbosity > 0):
             DumpClass(wiggle)
         
@@ -71,7 +76,7 @@ class EnergyThresholdScan:
         
         fit = BuildTF1(fitFunc, 5, "5par", "five_parameter_fit", 30, 650)
         if(self.initialParameters is None):
-            fit.SetParameters([8926203,64.434,0.34402,-38,5.15])
+            fit.SetParameters([8926203,64.434,0.34402,-48., 1.5])
         else:
             fit.SetParameters(self.initialParameters)
         fit.SetParNames()
@@ -152,7 +157,7 @@ class EnergyThresholdScan:
             gr.SetPoint(j, self.whichBinEnergies[j], pars[j])
         fit = r.TF1("fit",func)
         for fiti in range(2):
-            gr.Fit(fit,"Q")
+            gr.Fit(fit,"")
 
         quadPars = [fit.GetParameter(x) for x in range(nPar)]
         quadErrs = [fit.GetParError(x) for x in range(nPar)]
@@ -160,7 +165,11 @@ class EnergyThresholdScan:
         if(func == "pol2"):
             p1 = uncertainties.ufloat( quadPars[1], quadErrs[1] )
             p2 = uncertainties.ufloat( quadPars[2], quadErrs[2] )
-            self.inflectionPoint[i] = -1*p1 / (2*p2)
+            if(p2 != 0):
+                self.inflectionPoint[i] = -1*p1 / (2*p2)
+            else:
+                return((0,0,[]))
+            
             return (self.inflectionPoint[i].n, self.inflectionPoint[i].s, 
                     TF1toPython(fit, self.whichBinEnergies[0], self.whichBinEnergies[len(pars) - 1]))
         else:

@@ -273,6 +273,43 @@ class WiggleFit:
             raise ValueError("ERROR: tracker model is unknown")
 
         return A_CBO
+    
+    def getFieldIndex_FromCBO(self, omega_cbo = None):
+        '''
+            Returns a field index for the given value of omega_CBO. 
+            Imputs:
+                omega_CBO (taken from current parameters)
+                omega_cyclotron (const float)
+        '''
+        if(omega_cbo is None):
+            omega_cbo = self.f.GetParameter(9)*2*math.pi # get value of omega_0 if one is not provided
+        
+
+        return (omega_cbo * (2 * self.omega_c - omega_cbo)) / (self.omega_c**2)
+
+    def getOmegaVW_FromFieldIndex(self, pars):
+        '''
+            Instead of fitting omega_vw, calculate it from the CBO frequency.
+            Model from Aaron
+        '''
+        omega_cbo = pars[0]
+        delta_vw = pars[1]
+        field_index = self.getFieldIndex_FromCBO(omega_cbo)
+
+        omega_vw = (1 + delta_vw / 100.) * self.omega_c * (1 - 2 * sqrt(field_index))
+        return omega_vw
+
+    def getOmegaY_FromFieldIndex(self, pars):
+        '''
+            Instead of fitting omega_y (vertical betatron), calculate it from the CBO frequency.
+            Model from Aaron
+        '''
+        omega_cbo = pars[0]
+        delta_y = pars[1]
+        field_index = self.getFieldIndex_FromCBO(omega_cbo)
+
+        omega_y = (1 + delta_y / 100.) * self.omega_c * sqrt(field_index)
+        return omega_y
 
     #23-parameter function, adds changing cbo
     def blinded_wiggle_cbo_vw_Kloss_changingCBO(self, x, p):
@@ -337,6 +374,7 @@ class WiggleFit:
         self.cboFrequencyParameters = None
         self.isCBOFree = True
         self.customFunction = customFunction
+        self.omega_c = 42.1153248017936 #cyclotron frequency, constant value from Aaron
         
         if kind in self.funcDict.keys():
             self.kind = kind
@@ -699,16 +737,18 @@ class MakeWiggleFromTH2:
         self.isPileupCorrected = isPileupCorrected
         self.BinOrEnergy = BinOrEnergy
 
-        self.ebinlow = h3.GetYaxis().FindBin( self.elow )
-        self.ebinhigh = h3.GetYaxis().FindBin( self.ehigh )
 
         h3.GetXaxis().UnZoom()
         if(BinOrEnergy == "energy"):
             h3.GetYaxis().SetRangeUser(elow, ehigh)
             self.title = "Wiggle Plot for ["+str(elow)+" < E (MeV) < "+str(ehigh)+"] in Calo "+str(caloNum)
+            self.ebinlow = h3.GetYaxis().FindBin( self.elow )
+            self.ebinhigh = h3.GetYaxis().FindBin( self.ehigh )
         elif(BinOrEnergy == "bin"):
             h3.GetYaxis().SetRange(elow, ehigh)
             self.title = "Wiggle Plot for ["+str(elow)+" < E (Bin) < "+str(ehigh)+"] in Calo "+str(caloNum)
+            self.ebinlow = self.elow
+            self.ebinhigh = self.ehigh
         else:
             raise ValueError("BinOrEnergy has an unsupported value")
 

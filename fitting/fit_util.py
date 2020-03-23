@@ -239,6 +239,26 @@ def TF1toPython(func, xmin, xmax, nbins = 1000):
 
     return (xs, ys)
 
+def TF2toPython(func, xmin, xmax, ymin, ymax, nbins = 1000):
+    '''
+        returns array of points in x and y to be plotted in matplotlib
+    '''
+    import ROOT as r
+    import numpy as np
+
+    if( "ROOT.TF2" not in str(type(func))):
+        raise TypeError("ERROR: func is not of type TF2")
+    xs = []
+    ys = []
+    zs = []
+    for xi in np.linspace(xmin, xmax, nbins):
+        for yi in np.linspace(ymin, ymax, nbins):
+            xs.append(xi)
+            ys.append(yi)
+            zs.append( func.Eval(xi, yi) )
+
+    return (xs, ys, zs)
+
 def CompareFitParameters( fs, width = 6, names = None, verbosity = 0):
     '''
         Function which takes as input 1+ TF1's and compares their parameter values. 
@@ -283,3 +303,27 @@ def CompareFitParameters( fs, width = 6, names = None, verbosity = 0):
     plt.suptitle("Comparison of Fit Parameters", y=1.01, size=18)
     plt.tight_layout()
     plt.show()
+
+def InvertTH1(h, title = None, color = 38, alpha = 0.3, scaleFactor = -1):
+    '''
+        Utility function to simply invert a given TH1 and return the result. Also changes the color.
+        Inputs:
+            h (TH1): histogram to be inverted
+            title (str): optional, title of new hist
+            color (int): optional, color of new hist
+    '''
+    h2 = h.Clone()
+    h2.SetDirectory(0)
+
+    for i in range(h2.GetNbinsX()+1):
+        h2.SetBinContent(i, h.GetBinContent(i)*(scaleFactor))
+
+    if(title is not None):
+        h2.SetTitle(title)
+    else:
+        h2.SetTitle(h.GetTitle()+" [Inverse]")
+
+    h2.SetLineColor(color)
+    h2.SetFillColorAlpha(color, alpha)
+
+    return h2
