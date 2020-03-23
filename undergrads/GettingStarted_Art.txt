@@ -1,0 +1,41 @@
+Login to the fermilab virtual machines
+	ssh -X -C USER@gm2gpvm0X.fnal.gov
+Make a new directory to do this work in. The home directory has limited space so I often use something like:
+	mkdir -p /gm2/app/users/USER/work/firstArt
+	ln -s /gm2/app/users/USER/work/firstArt .
+Once you have that directory, do:
+	cd firstArt
+	 source /grid/fermiapp/products/common/etc/setups.sh
+	source /cvmfs/gm2.opensciencegrid.org/prod/g-2/setup
+	setup jobsub_client
+	setup fife_utils
+	setup gm2 v9_37_00 -q prof  
+	mrb newDev
+	source localProducts_gm2_v9_37_00_prof/setup
+	. mrb s
+This will initialize a new gm2 environment and allow you to start modifying the code directly. As a first step, lets just get one repository:
+	cd srcs/
+	mrb g gm2calo
+	cd ..
+	. mrb s
+	mrb b --generator ninja
+This will clone gm2calo into your srcs directory, setup everything and build the local copy. If you want to run on the grid later, you need to do 'mrb i' instead of 'mrb b' in the command above. Now lets run a simple analysis using the 'farline' analyzer. You can find it in srcs/gm2calo/analyses/CaloFarlineHistograms_module.cc or here https://redmine.fnal.gov/redmine/projects/gm2calo/repository/revisions/develop/entry/analyses/CaloFarlineHistograms_module.cc . To run this analysis we will need a fcl file, which tells art what to do. Thankfully, one already exists. Lets make a directory to do this analysis:
+	cd /gm2/app/users/USER/work/firstArt
+	mkdir analysis 
+	cd analysis 
+	cp ../srcs/gm2calo/fcl/runAutoProductionFeedback_Calorimeters.fcl .
+You can look in this fcl file to see what it's doing, but it essentially just uses one analyzer and produces one output file. Get an example input file:
+	ln -s /pnfs/GM2/daq/run1/offline/gm2_5040A/runs_16000/16368/gm2offline_full_21651868_16368.00041.root  input_file.root 
+And now run over it using your fcl file:
+	gm2 -c runAutoProductionFeedback_Calorimeters.fcl -s input_file.root -T output_file.root 
+This should run for a while and then spit out an output file called output_file.root (or whatever you want to call it). You can then open the output as normal
+	root -l output_file.root
+NOTE: You may get an error like this
+	getBySelector: Found zero products matching all criteria
+	Looking for type: art::TriggerResults
+	cet::exception going through module CaloFarlineHistograms/farline run: 16368 subRun: 41 event: 1
+	
+	This is due to a change from Run1 to Run2 naming conventions. To fix it, change the line:
+		SelectEvents: ["caloReco:muonPathwithDQC"] 
+	to:
+		SelectEvents: ["offline:muonPathwithDQC"] 
