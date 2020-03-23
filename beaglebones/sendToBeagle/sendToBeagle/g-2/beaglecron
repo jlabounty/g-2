@@ -1,0 +1,11 @@
+# beaglecron : crontab for g-2 beagle broker
+# Aaron Fienberg
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+@reboot root echo BB-SPI0-01 > /sys/devices/bone_capemgr.9/slots; echo BB-SPI1-01 > /sys/devices/bone_capemgr.9/slots
+@reboot root /home/g-2/beagle-code/startBroker.sh
+@reboot root /home/g-2/beagle-code/startWorkers.sh
+* * * * * root /home/g-2/beagle-code/startBroker.sh
+* * * * * root /home/g-2/beagle-code/startWorkers.sh

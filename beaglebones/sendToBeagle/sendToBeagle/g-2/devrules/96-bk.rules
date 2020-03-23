@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", KERNEL=="ttyUSB*", MODE="0660", IMPORT{program}="/home/g-2/devrules/set_bk_env.py %k", SYMLINK+="bk$env{bknum}"
