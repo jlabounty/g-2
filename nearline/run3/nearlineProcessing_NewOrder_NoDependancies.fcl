@@ -1,0 +1,645 @@
+# this fhicl is for nearline processing
+
+# #include "caloConfig.fcl"
+# #include "auxConfig.fcl"
+#include "syncPulseAverageTimes.fcl" 
+#include "timingAlignmentConstants23609.fcl"
+#include "syncPulseEnergies23609.fcl"
+#include "mipEnergyCalibration23609.fcl"
+#include "pedestalOffsets_run2.fcl"
+#include "inFillGainParams.fcl"
+#include "gainServiceIfgParams.fcl"
+
+
+process_name : nearlineProcessing
+
+// Definition of the input source: MIDAS raw data file	
+source : 
+{
+  module_type : MidasBankInput
+  detail : 
+  {
+      requestedBanks: [  "TRIG", "GPS0", 
+                        "TTCA", "TTCB", "TTCZ",   
+                        "FZ", "CC", "IBM0", "IBM1"]
+      maxBankWordsToPrint : 0
+      online              : false
+      eventIDMask         : 0x1 // Select event builder events only
+  }
+}
+
+
+services : 
+{
+
+  # needed for parsing the unpacking modules
+  ODBHolder : {}
+
+  # calorimeter template fitters
+  TemplateFitterHolder : 
+  {
+    storeSplines : true
+    preloadAllFitters: true
+    useCaloTemplates: true #store all the templates in one file
+    isSimulation: false
+    templateSet : "Run2"
+    #chainIslands : false
+    #templateSamples : 1000
+    #nIterations : 20
+  }
+
+  #TimeTracker: 
+  #{
+  #  dbOutput : {
+  #     filename : "v9_timing.db"
+  #     overwrite : true
+  #  }
+  #}
+
+
+  # database for nearline constants
+  Database: 
+  {
+    conDBHost : 'dbdata0vm.fnal.gov'
+    conDBPort : 9091
+    conDBName : postgres_dev
+    psqlDBHost  :  'g2db-priv'
+    psqlDBPort  :  5433
+    psqlDBName  :  'gm2_online_prod'
+    psqlDBUser  :  'postgres'
+  }
+
+  # message service
+  message : 
+  {
+     debugModules : ["*"]
+     suppressInfo : []
+
+     destinations : 
+     {
+        LogToConsole : 
+        {
+          type      : "cout"
+          threshold : "DEBUG"
+        }
+        
+        LogToFile : 
+        {
+           type       : "file"
+           filename   : "gm2offline_full.log"
+           append     : false
+           threshold  : "DEBUG"
+        }
+     }
+  } # message
+
+  scheduler: 
+  {
+	errorOnFailureToPut: false 
+  }
+
+  TFileService : 
+  {
+    fileName : "gm2offline_full.root"
+  }
+
+ RandomNumberGenerator : {}
+ Gm2Constants : {} 
+
+} # end of services
+
+
+physics : {
+
+  filters: 
+  {
+     @table::auxChain.filters	
+     # @table::caloChain.filters
+
+      #filter out only muon fills
+      MuonFilter: 
+      {
+         module_type: CCCTriggerTypeFilter
+         fc7ModuleLabel: cccUnpacker
+         fc7InstanceLabel: unpacker
+         triggerType: 1
+      }
+
+      InFillLaserFilter: 
+      {
+         module_type: CCCInFillLaserFilter
+         fc7ModuleLabel: cccUnpacker
+         fc7InstanceLabel: unpacker
+      }
+
+      QInFillLaserFilter: 
+      {
+         module_type: QInFillLaserFilter
+         fc7ModuleLabel: cccUnpacker
+         fc7InstanceLabel: unpacker
+      }
+
+      LaserModeFilter: 
+      {
+         module_type: StandardModeLaserFilter
+         laserConfigModuleLabel: laserConfigReader
+         laserconfigInstanceLabel: reader
+      }
+
+      LaserFilter : 
+      {
+         module_type      : CCCTriggerTypeFilter
+         fc7ModuleLabel   : cccUnpacker
+         fc7InstanceLabel : unpacker
+         triggerType     : 2
+      }
+
+      PedestalFilter : 
+      {
+         module_type      : CCCTriggerTypeFilter
+         fc7ModuleLabel   : cccUnpacker
+         fc7InstanceLabel : unpacker
+         triggerType     : 3
+      }
+
+      AsyncFilter : 
+      {
+         module_type:      CCCTriggerTypeFilter
+         fc7ModuleLabel:   cccUnpacker
+         fc7InstanceLabel: unpacker
+         triggerTypes:     [4, 7]
+      }
+
+   }  # end of filters
+
+   producers: 
+   {
+      # @table::caloChain.producers
+      fzInflater : 
+      {
+         module_type      : FZInflater
+         bankNames        : [ "CZ", "LZ", "PZ", "AZ",
+                              "CQ", "HQ", "0Q", "KQ", "qQ",
+                              "CA", "LA", "AA", "PA",
+                              "CB", "LB", "PB", "AB",
+                              "CR", "LR", "PR", "AR",
+                              "CT", "XT", "CF", "0T",
+                              "CP",
+                              "CS", "0S", "TT" ]
+         validateChecksum : true
+         inputModuleLabel : MidasBankInput
+      }
+
+      cccUnpacker: 
+      {
+         module_type  : FC7Unpacker
+         verboseLevel : 0
+      }
+
+     utcaUnpacker: 
+     {
+         module_type      : UTCAUnpacker
+         verboseLevel     : 0
+         bankPrefixes     : ["C", "L", "A", "P"]
+         inputModuleLabel : fzInflater
+     }
+         
+
+
+     @table::auxChain.producers
+
+
+     pedestalCorrector: 
+     {
+         module_type : PedestalOffsetCorrection
+         offsets:  @local::pedestal_offsets
+     }
+
+     #headerUnpacker: @local::caloChain.producers.headerUnpacker
+      headerUnpacker: 
+      {
+         module_type      : CaloHeaderUnpacker
+         verboseLevel     : 0
+         bankPrefixes     : ["C", "L"]
+         inputModuleLabel : fzInflater
+         cdfModuleLabel   : utcaUnpacker
+      }
+      
+      #rawUnpacker: @local::caloChain.producers.rawUnpacker
+      rawUnpacker: 
+      {
+         module_type       : CaloRawUnpacker
+         verboseLevel      : 0
+         bankPrefixes      : ["C", "L"]
+         nCrates           : 28
+         headerModuleLabel : utcaUnpacker
+         inputModuleLabel  : fzInflater
+         //skipIndices       : [9]  #unsure what run this starts with, but keep in for now
+      }
+     
+     #CPUnpacker: @local::caloChain.producers.CPUnpacker
+      CPUnpacker: 
+      {
+        module_type: CaloCPUnpacker
+        inputModuleLabel: fzInflater
+      }
+
+
+     islandUnpacker: 
+     {
+         @table::caloChain.producers.islandUnpacker
+         skipIndices : [25, 26, 27, 28]
+         bankPrefix: "C" #normal value = C
+         #bankPrefix: "T"
+     }     
+
+     islandUnpackerFull: 
+     {
+         #@table::caloChain.producers.islandUnpacker
+         module_type          : IslandUnpacker  
+         inputModuleLabel     : fzInflater
+         verboseLevel         : 0 
+         sortIslands          : true 
+         #unpackerInstanceName : unpackerFull
+         skipIndices : [25, 26, 27, 28]
+         bankPrefix: "T"
+     }     
+     
+     islandFitterDAQ: 
+     { 
+         module_type:            IslandTemplateFit
+         fitterInstanceLabel:    fitter
+         unpackerModuleLabel:    pedestalCorrector
+         unpackerInstanceLabel:  corrector
+         negativePolarity:       false
+         peakCutoff:             50
+         peakFitScaleThreshold:  75
+         residualCutoff:         50  // to fit MIP pulse
+         artificialDeadTime:     2
+         useCPpedestals:         true
+         skipIndices:            [25, 26, 27, 28]
+         skipWindow:             [89000,106000]
+         noiseScaleCut:          550
+         noiseChi2Cut:           300
+         noiseTimeCut:           2
+         noiseNPulsesCut:        3
+         minSamplePedestalCheck: true
+      }
+     
+      #energyCalibratorDAQ: @local::caloChain.producers.energyCalibratorDAQ
+      energyCalibratorDAQ: 
+      { 
+         module_type             : DBEnergyCalibrator
+         calibratorInstanceLabel : calibrator
+         #fitterModuleLabel       : stdplaserCorrector
+         #fitterInstanceLabel     : corrector
+         fitterModuleLabel       : islandFitterDAQ
+         fitterInstanceLabel     : fitter
+         tableName               : calorimeter_calibration_correction_constants
+         #@table::caloChain.producers.energyCalibratorDAQ
+         readDBConstants:        false 
+         readConstants:          true   
+         constants:              @local::absolute_calibration_constants 
+         gainCorrectionLimitHigh: 1000.0
+         gainCorrectionLimitLow : -1000.0
+      }
+
+      nearlineSyncAlarm : 
+      {
+         module_type              : NearlineSyncPulseAlarm
+         correctorInstanceLabel   : corrector
+         nCalos                   : 24
+         nXtals                   : 54
+         syncPulseTimeCutLow      : 5000
+         syncPulseTimeCutHigh     : 5600
+         syncPulseMeanTime        : 5400
+         alignmentStrategy        : beam
+         t0ChannelNum             : 0
+         defaultDeltaTBeamSync    : 19420
+         t0integralModuleLabel    : t0PulseProcessor
+         t0integralInstanceLabel  : ""
+         t0syncPulseModuleLabel   : t0SyncProcessor
+         t0syncPulseInstanceLabel : ""
+
+         inputHitModuleLabel      : energyCorrector
+         inputHitInstanceLabel    : calibrator
+         syncPulseEnergyThreshold : 100
+
+         timeConstants            : @local::nearline_sync_timing_constants
+      }
+
+      timeCorrectorDAQ: 
+      {
+         module_type              : SyncPulseTimeCorrector
+         correctorInstanceLabel   : corrector
+         #inputHitModuleLabel      : longTermGainCorrectionDAQ
+         #inputHitInstanceLabel    : corrector
+         nCalos                   : 24
+         nXtals                   : 54
+         syncPulseTimeCutLow      : 5000
+         syncPulseTimeCutHigh     : 5600
+         syncPulseMeanTime        : 5400
+         alignmentStrategy        : beam
+         t0ChannelNum             : 0
+         defaultDeltaTBeamSync    : 99420
+         t0integralModuleLabel    : t0PulseProcessor
+         t0integralInstanceLabel  : ""
+         t0syncPulseModuleLabel   : t0SyncProcessor
+         t0syncPulseInstanceLabel : ""
+         #@table::caloChain.producers.timeCorrectorDAQ
+         inputHitModuleLabel      : energyCalibratorDAQ
+         inputHitInstanceLabel    : calibrator
+	      syncPulseEnergyThreshold : 100 
+	      #verboseLevel : 100
+      }
+
+      energyCorrector : 
+      {
+         module_type : DBEnergyCalibrator
+         correctorInstanceLabel : calibrator
+         fitterModuleLabel      : timeCorrectorDAQ 
+         fitterInstanceLabel    : corrector
+         calibrationConstant    : 0.3
+         tableName: nearline_sync_energy_constants
+         constantType: driftCorrection
+         readDBConstants        : true
+         readOnce : true
+         gainCorrectionLimitHigh: 10.0
+         gainCorrectionLimitLow : 0.3
+         skipCalos :    [22, 5]
+         skipCrystals : [33, 6] #these lengths must match exactly
+         verboseLevel : 100
+      }
+
+      timeOffsetCorrectorDAQ: 
+      {
+         module_type           : FixedTimeOffsetCorrection
+         timeConstants         : @local::timing_alignment_constants
+         # @table::caloChain.producers.timeOffsetCorrectorDAQ
+         inputHitModuleLabel      : energyCorrector
+         inputHitInstanceLabel    : calibrator
+      } 
+    
+     hitClusterDAQ: 
+     {
+         # @table::caloChain.producers.hitClusterDAQ
+         module_type            : HitCluster
+         clusterInstanceLabel   : cluster
+         minEnergy              : 1000000
+         timeCutoffLow          : 3
+         timeCutoffHigh         : 5
+         correctorModuleLabel   : timeOffsetCorrectorDAQ 
+         correctorInstanceLabel : corrector 
+     }
+
+      #tqUnpacker: @local::auxChain.producers.tqUnpacker
+      tqUnpacker : 
+      {
+          module_type      : CQUnpacker
+          bankStem         : "0Q"
+          tqMethodNum      : 2
+          ncalos           : 1
+          inputModuleLabel : fzInflater
+      }
+      
+      # tIslandUnpacker: @local::auxChain.producers.tIslandUnpacker
+      tIslandUnpacker: 
+      {
+         module_type          : IslandUnpacker
+         unpackerInstanceName : unpacker
+         inputModuleLabel     : fzInflater
+         tqMethodNum          : 2
+         bankPrefix           : "0"
+         verboseLevel         : 0
+      }
+
+      #ibmsUnpacker: @local::auxChain.producers.ibmsUnpacker
+      ibmsUnpacker: 
+      {
+         module_type : IBMSUnpacker
+         bankName: "IBM0"
+      }
+
+      ibmsUnpacker0: 
+      {
+         module_type : IBMSUnpacker
+         bankName: "IBM0"
+      }
+
+      ibmsUnpacker1: 
+      {
+         module_type : IBMSUnpacker
+         bankName: "IBM1"
+      }
+
+      #t0PulseProcessor: @local::auxChain.producers.t0PulseProcessor
+      t0PulseProcessor: 
+      {
+         module_type             : T0BeamPulseProcessor
+         processorInstanceLabel  : ""
+         unpackerModuleLabel     : tqUnpacker
+         unpackerInstanceLabel   : unpacker
+         baselineFitLength       : 200
+         pulseHeightThreshold    : 25
+         overThresholdLength     : 25
+      }
+
+      #t0SyncProcessor: @local::auxChain.producers.t0SyncProcessor
+      t0SyncProcessor: 
+      {
+         module_type                 : T0SyncPulseProcessor
+         processorInstanceLabel      : ""
+         islandUnpackerModuleLabel   : tIslandUnpacker
+         islandUnpackerInstanceLabel : unpacker
+         maxSampleNum                : 7000
+         baselineFitLength           : 25
+         pulseHeightThreshold        : 10
+         overThresholdLength         : 7
+         channelsToConsider          : [0,1]
+      }
+      
+      #ibmsProcessor: @local::auxChain.producers.ibmsProcessor
+      ibmsProcessor : 
+      {
+         module_type          : IBMSProcessor
+         ibmsRawModuleLabel   : ibmsUnpacker
+         ibmsRawInstanceLabel : unpacker
+      }
+
+
+      clusterFinder: 
+      {
+         module_type : ClusterCoincidenceFinder
+         clusterModuleLabel: hitClusterDAQ
+         clusterInstanceLabel: cluster
+         caloOffsets: [1]
+         tMin: 4000
+         eLow: 50
+         eHigh: 250
+         deltaTLow: 4.4
+         deltaTHigh: 5.6
+         maxCoincidenceLevel: 4
+      }
+
+  } # end of producers
+
+  analyzers: 
+  {
+   
+      nearlineHistTree: 
+      {
+         module_type: CaloNearlineHistograms
+         SelectEvents: [muonPath]
+         useDatabase: true
+         excludeLaser : true
+         ctagTimeCut: 24000
+         ctagEnergyCutLow : 1700
+         wiggleThreshold: 1700
+         eHistMax: 120000
+         SelectEvents: [muonPath]  
+      }
+
+      clusterTree: 
+      {
+         module_type: ClusterTree
+         clusterModuleLabel: hitClusterDAQ 
+         SelectEvents: [muonPath]
+      }
+
+      t0Analyzer: 
+      {
+         module_type: T0PulseProcessorAnalyzer
+         storeBeamTraces: true
+         storeSyncPulseTraces: true
+         integralModuleLabel: t0PulseProcessor
+         integralInstanceLabel: ""
+         syncPulseModuleLabel: t0SyncProcessor
+         syncPulseInstanceLabel: ""
+         islandModuleLabel: tIslandUnpacker
+         islandInstanceLabel: unpacker
+         fc7ModuleLabel: cccUnpacker
+         fc7InstanceLabel: unpacker
+         ctagModuleLabel: ctagProducer
+         ctagInstanceLabel: ctagLabel
+         qUnpackerModuleLabel: tqUnpacker
+         SelectEvents: [muonPath]
+      }
+
+      ibmsAnalyzer: 
+      {
+         module_type: IBMSAnalyzer
+         ibmsRawModuleLabel0: ibmsUnpacker0
+         ibmsRawModuleLabel1: ibmsUnpacker1
+         ibmsRawInstanceLabel: unpacker
+         nIBMS: 3
+         tStart: 60
+         tEnd: 500
+         SelectEvents: [muonPath]
+      }
+
+      CoincidenceFinderLM: 
+      {
+         module_type: CoincidenceFinderLM
+         multiModuleLabel : clusterFinder
+         SelectEvents: [muonPath]
+      }
+
+      fastRotationPlots : 
+      {
+         module_type: FastRotationNearline
+         SelectEvents: [muonPath]                                                                                                                                                                      
+      }
+
+      islands: 
+      {
+         module_type       : CaloIslandAnalyzer
+         islandModuleLabel  : islandUnpacker 
+         islandInstanceLabel: unpacker  
+         nCalos: 24      
+         useXtalNumbering: true 
+      }  
+
+      islandsFull: 
+      {
+         module_type       : CaloIslandAnalyzer
+         islandModuleLabel  : islandUnpackerFull
+         islandInstanceLabel: unpacker
+         nCalos: 24
+         useXtalNumbering: true 
+      }  
+
+      CTvsTT: 
+      {
+         module_type       : CTvsTTComparison
+         islandModuleLabel  : islandUnpacker
+         islandInstanceLabel: unpacker
+         islandModuleLabelFull  : islandUnpackerFull
+         islandInstanceLabelFull: unpacker
+         nCalos: 24
+         useXtalNumbering: true 
+         maxIslands: 20
+         maxFills: 3
+      }  
+
+  } #end analyzers
+
+  // Define paths/streams
+  muonPath         : [# @sequence::caloChain.commonPath,
+                      fzInflator, 
+                      utcaUnpacker, 
+                      cccUnpacker,
+                      MuonFilter,
+                      headerUnpacker,
+                      rawUnpacker,
+                      CPUnpacker,
+                      islandUnpacker,
+                      pedestalCorrector,
+                      islandFitterDAQ,
+                      #add stdp here!
+                      energyCalibratorDAQ,
+                      tIslandUnpacker,
+                      tqUnpacker,
+                      t0SyncProcessor,
+                      t0PulseProcessor,
+                      timeCorrectorDAQ,
+                      energyCorrector,
+                      #nearlineSyncAlarm,
+                      timeOffsetCorrectorDAQ,
+                      hitClusterDAQ,
+                      ctagProducer,
+                      clusterFinder,
+                      ibmsUnpacker,
+                      ibmsUnpacker0,
+                      ibmsUnpacker1,
+                      ibmsProcessor
+                      ]
+  
+  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots, CTvsTT]
+  analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots]
+  //analyzerPath: [ nearlineHistTree, clusterTree, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots]
+  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM]
+  //analyzerPath: [ nearlineHistTree, clusterTree, ibmsAnalyzer]
+  //analyzerPath: [ nearlineHistTree, clusterTree, ibmsAnalyzer, t0Analyzer]
+  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer]
+  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer]
+  //analyzerPath: [ nearlineHistTree, clusterTree ]
+  //analyzerPath: [ nearlineHistTree ]
+
+  trigger_paths  : [ muonPath ]
+  end_paths      : [ analyzerPath ]
+
+} // end of physics block
+
+
+#outputs : 
+#{
+#  outfile: {
+#     module_type    : RootOutput
+#     fileName       : "gm2offline_full.root"
+#     dataTier       : "full"
+#     SelectEvents   : [ muonPath ]
+#     outputCommands : [ "keep *",
+#                        "drop gm2midastoart::MidasBankArtRecords_*_*_*" ]
+#  }
+#
+#} // end of output block
