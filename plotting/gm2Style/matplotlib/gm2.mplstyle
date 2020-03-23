@@ -1,0 +1,69 @@
+#Style sheet for g-2 plots made in matplotlib
+#Version 0.1
+#Josh LaBounty --- jjlab@uw.edu
+#9/13/2019
+
+#to use: put in current working directory and then include the line plt.style.use('./gm2.mplstyle') in your python script
+
+
+#Axes
+axes.titlesize : 84
+axes.labelpad : 5
+axes.labelsize : 30
+axes.facecolor      : white
+axes.axisbelow      : line 
+
+axes.formatter.use_locale : False
+axes.formatter.useoffset      : False
+axes.formatter.limits : -7, 7
+
+axes.prop_cycle    : cycler('color', [ 'CC3311', '0077BB' , '33BBEE', '009988', 'EE7733', 'EE3377', '1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2', '7f7f7f', 'bcbd22', '17becf'])
+
+
+
+#Tick Marks
+xtick.labelsize : 25
+xtick.direction : in
+xtick.minor.visible : True
+xtick.major.size    : 6.5 
+xtick.minor.size    : 3.5  
+
+ytick.labelsize : 25
+ytick.direction : in
+ytick.minor.visible : True
+ytick.major.size    : 6.5 
+ytick.minor.size    : 3.5  
+
+#Lines and Markers
+lines.linewidth : 3
+lines.markersize : 10
+
+#Font
+font.family         : sans-serif
+font.sans-serif  : DejaVu Sans #similar to helvetica, which isn't built in apparantly.
+font.size : 25
+
+#Figure
+figure.figsize     : 6.4, 6.4
+figure.dpi : 300
+figure.autolayout : True
+
+## ***************************************************************************
+## * IMAGES                                                                  *
+## ***************************************************************************
+image.aspect : equal            ## {equal, auto} or a number
+image.cmap   : viridis          ## A colormap name, gray etc...
+image.lut    : 256              ## the size of the colormap lookup table
+image.composite_image : True  ## When True, all the images on a set of axes are
+                               ## combined into a single composite image before
+                               ## saving a figure as a vector graphics file,
+                               ## such as a PDF.
+
+## ***************************************************************************
+## * HISTOGRAM PLOTS                                                         *
+## ***************************************************************************
+hist.bins : 50  ## The default number of histogram bins or 'auto'.
+
+
+
+
