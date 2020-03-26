@@ -1,0 +1,1290 @@
+
+labounty@gm2gpvm04 gridsubmit $ source ./setup
+unsetlabounty@gm2gpvm04 gridsubmit $ unsetup python
+ERROR: Cannot do unsetup, SETUP_PYTHON is not defined
+labounty@gm2gpvm04 gridsubmit $ ./gridSetupAndSubmitGM2Data.sh --daq --ana --fhicl clusterAndCoinHists.fcl  --sam-dataset gm2pro_daq_offline_run2_Prod_C  --njobs 400 --output-dir /pnfs/GM2/scratch/users/labounty/gridoutput --localArea --memory 3 --lifetime 24h --noGrid --sam-max-files 1
+
+***Submitting 400 jobs with --noGrid option. However multiple jobs running is only possible with --Grid option.
+***Proceed with single job running mode now (i.e. --njobs 1) ...
+
+
+./gridSetupAndSubmitGM2Data.sh --daq --ana --fhicl clusterAndCoinHists.fcl --sam-dataset gm2pro_daq_offline_run2_Prod_C --njobs 400 --output-dir /pnfs/GM2/scratch/users/labounty/gridoutput --localArea --memory 3 --lifetime 24h --noGrid --sam-max-files 1
+
+Submission log: /tmp/tmp.ukIRBKpbPg/submission.log
+
+
+------ Running DAQ campaign: "run", processing "ana" data tier (v9_40_00) -----------
+
+Processing dataset name: gm2pro_daq_offline_run2_Prod_C ...
+
+***'sam-max-files' is set to be 1, which is less than the total number of files (89595) from gm2pro_daq_offline_run2_Prod_C dataset.
+***This will cause each job to (randomly) select and consume only 1 file(s) from gm2pro_daq_offline_run2_Prod_C dataset.
+***It is OK to do this if you are running a test or you have a hard limit on the number of input files per job,
+***although this might hurt the overall job efficiency (check details at https://cdcvs.fnal.gov/redmine/projects/g-2/wiki/Job_Running_Submission_FAQ).
+***The recommended way to run over all files from gm2pro_daq_offline_run2_Prod_C dataset is to NOT set 'sam-max-files' at all.
+***This will allow all 89595 files to be (randomly and more or less evenly) consumed by 1 jobs and produce one output file per job.
+***If you require one output file per input file instead, please also activate --noifdh_art and --onebyone options.
+***If you wish to change the configuration and re-submit, Ctrl+C to exit now!
+
+
+Authorizing ...... authorized
+Fetching certificate ..... fetched
+Storing certificate in /tmp/x509up_u53872
+Your certificate is valid until: Thu Apr  2 12:42:31 2020
+Your identity: /DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Joshua Labounty/CN=UID:labounty
+Contacting  voms2.fnal.gov:15001 [/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=voms2.fnal.gov] "fermilab" Done
+Creating proxy ................................. Done
+
+Your proxy is valid until Fri Mar 27 00:42:32 2020
+
+Main FCL(s): clusterAndCoinHists.fcl
+Remote Main FCL(s): clusterAndCoinHists.fcl.tmp
+
+IFDH_ART interface activated
+
+Number of jobs: 1
+Number of dataset files: 89595
+Number of events per job: -1
+One output file (set) per input file: NO
+Multiple root files per output set: NO
+
+
+Output directory: /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33
+
+Copy main FHiCL file to the output directory ...
+LOCK - Thu Mar 26 17:42:36 UTC 2020 lock  /grid/data/gm2/LOCK/LOCKS/20200326.17:42:36.2.gm2gpvm04.4645.labounty.labounty
+LOCK - Thu Mar 26 17:42:38 UTC 2020 freed /grid/data/gm2/LOCK/LOCKS/20200326.17:42:36.2.gm2gpvm04.4645.labounty.labounty
+
+Using local setup at /nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof ...
+
+You are already running jobs locally with --noGrid option. The script will look over /nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof and perform necessary setup and then run jobs locally.
+
+source ./submitGM2Data.sh multipleroot False muon True noGrid True input-dir None fhiclFile clusterAndCoinHists.fcl disk 33 useProRole False runNumber 1 hadd False digit False prestage False cvmfs True daq True haddopt None timing False help_common False localArea True samelocal False nevents -1 timeout -1 release v9_40_00 output-dir /pnfs/GM2/scratch/users/labounty/gridoutput quadoff False kickeroff False njobs 400 help_data False harp False noifdh_art False truth False tracker False sam-max-files 1 core None full False reco False memorytracker False debug False requestid 9999 first-event 1 daqmc None offsite Yes os SL6 beamGun False schemas_uri fndca1.fnal.gov/pnfs/fnal.gov/usr/ verbose False campaign run proton False ring False nmuonsPerFill 1 sl6 True sl7 False nova False maxof 150 json False memory 3 help_process False onebyone False calo False blacklist None qual e15:prof unpack False miGun False mc False sam-dataset gm2pro_daq_offline_run2_Prod_C help_detector False input-filelist None ana True process None site None tag None lifetime 24h schemas xroot input-file None toplocaldir False simpleGun False cleanup False test False config nominal help_particle False trace False gasGun False offsite-only False dropbox No help_gun False pion False maxconcurrent -1 input-ext root lines None cpu 1 subgroup None  runNumber 1 remoteFile clusterAndCoinHists.fcl.tmp remoteFiles clusterAndCoinHists.fcl.tmp outfiles /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33 ...
+
+>>>Here is the your environment and a few debug statements in this job:
+
+>>>gm2 RELEASE=v9_40_00
+
+Thu Mar 26 12:42:41 CDT 2020
+
+>>>setup cvmfs common products
+
+>>>Job started on Linux gm2gpvm04.fnal.gov 2.6.32-754.28.1.el6.x86_64 #1 SMP Wed Mar 11 12:07:33 CDT 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+OS=SL6
+
+OFFSITE=0
+
+LD_LIBRARY_PATH=/grid/fermiapp/products/common/db/../prd/curl/v7_64_1/Linux64bit-2-6/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/gallery/v1_07_02/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2field/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2fieldsignal/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2analyses/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2midastoart/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2unpackers/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2trackerdaq/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/gm2midas/v2_00_00/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2calo/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2reconeast/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/libwda/v2_24_0/Linux64bit+2.6-2.12/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2aux/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2ringsim/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/cadmesh/v1_0_0/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2tracker/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2geom/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2util/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/pqxx/v5_0_1a/Linux64bit+2.6-2.12-e15-p2714b-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2db/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2dataproducts/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/artg4/v9_40_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/geant4/v4_10_3_p03agm2/Linux64bit+2.6-2.12-e15-us-prof/lib64:/cvmfs/gm2.opensciencegrid.org/prod/external/vecgeom/v0_4a/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/xerces_c/v3_1_4b/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/art/v2_10_03/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/canvas_root_io/v1_01_02/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/xrootd/v4_8_0a/Linux64bit+2.6-2.12-e15-prof/lib64:/cvmfs/gm2.opensciencegrid.org/prod/external/libxml2/v2_9_5/Linux64bit+2.6-2.12-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/mysql_client/v5_5_58/Linux64bit+2.6-2.12-e15/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/postgresql/v9_6_6a/Linux64bit+2.6-2.12-p2714b/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/pythia/v6_4_28j/Linux64bit+2.6-2.12-gcc640-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/gsl/v2_4/Linux64bit+2.6-2.12-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/fftw/v3_3_6_pl2/Linux64bit+2.6-2.12-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/root/v6_12_04e/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/canvas/v3_02_02/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/cppunit/v1_13_2b/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/clhep/v2_3_4_5c/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/messagefacility/v2_01_06/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/tbb/v2018_2/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/fhiclcpp/v4_06_05/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/cetlib/v3_02_00/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/boost/v1_66_0/Linux64bit+2.6-2.12-e15-prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/cetlib_except/v1_01_06/slf6.x86_64.e15.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/gcc/v6_4_0/Linux64bit+2.6-2.12/lib64:/cvmfs/gm2.opensciencegrid.org/prod/external/gcc/v6_4_0/Linux64bit+2.6-2.12/lib:/cvmfs/gm2.opensciencegrid.org/prod/g-2/gm2/v9_40_00/slf6.x86_64.prof/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/gm2pip/v1_01_00/Linux64bit+2.6-2.12/prefix/lib/python2.7/site-packages:/cvmfs/gm2.opensciencegrid.org/prod/external/gm2pip/v1_01_00/Linux64bit+2.6-2.12/prefix/lib:/cvmfs/gm2.opensciencegrid.org/prod/external/git/v2_15_1/Linux64bit+2.6-2.12/lib64:/grid/fermiapp/products/common/db/../prd/ifdhc/v2_4_5/Linux64bit-2-6-2-12/lib
+
+UPS_OVERRIDE=
+
+Thu Mar 26 12:42:42 CDT 2020
+
+>>>setup g-2 software and ifdh tools
+
+g-2 software
+
+--> To list gm2 releases, type
+ups list -aK+ gm2
+
+--> To use the latest release, do
+setup gm2 v9_40_00 -q prof
+
+For more information, see
+  https://cdcvs.fnal.gov/redmine/projects/g-2/wiki/SoftwareReleases
+
+setup gm2 v9_40_00 -q prof
+/cvmfs/gm2.opensciencegrid.org/prod/external/ifdhc/v2_3_2/Linux64bit+2.6-2.12-e15-p2714b-prof/bin/ifdh
+
+Thu Mar 26 12:42:48 CDT 2020
+
+CLUSTER=0
+PROCESS=0
+DAGMANJOBID=
+JOBSUBPARENTJOBID=
+JOBSUBJOBSECTION=
+JOBSUBJOBID=noGrid
+
+
+>>>Setup localProducts:
+PRODUCTS=/nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof:/cvmfs/gm2.opensciencegrid.org/prod/g-2:/cvmfs/fermilab.opensciencegrid.org/products/common/db:/grid/fermiapp/products/common/db:/nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof:/cvmfs/gm2.opensciencegrid.org/prod/g-2:/cvmfs/gm2.opensciencegrid.org/prod/external:/grid/fermiapp/products/common/db
+
+package in local area: gm2analyses
+Upating /nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof/gm2analyses/v9_40_00/fcl ...
+setup gm2analyses v9_40_00 -q e15:prof
+
+package in local area: gm2calo
+Upating /nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof/gm2calo/v9_40_00/fcl ...
+setup gm2calo v9_40_00 -q e15:prof
+Upating /nashome/l/labounty/labounty/work/test/localProducts_gm2_v9_40_00_prof/setup/v9_40_00/fcl ...
+
+>>>Environment setup saved to env_*.log.
+
+Thu Mar 26 12:43:03 CDT 2020
+
+
+>>>ifdh startProject labounty_2020032612_4202 gm2 gm2pro_daq_offline_run2_Prod_C labounty gm2
+
+
+>>>ifdh establishProcess https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 gm2 v9_40_00 gm2gpvm04.fnal.gov labounty run noGrid 1 xroot
+
+
+>>>ifdh getNextFile https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 17790134
+
+
+>>>Initial FILE URI to parse: xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root
+
+
+INPUT:            gm2pro_daq_offline_run2_Prod_C
+FCL:              clusterAndCoinHists.fcl.tmp
+ROLE:             Analysis
+CAMPAIGN:         run
+RUN:              24803
+SUBRUN:           00484
+TYPE:             daq
+TIER:             ana
+GUN:              None
+PARTICLE:         muon
+TAG:              offline
+SYSTEM:           None
+CLUSTER:          0
+AFFINITY:         None
+SAM_FILE_LIMIT:   1
+IFDH_ART:         1
+ONE_BY_ONE:       NO
+SCHEMAS:          xroot
+OUTPUT_DIR:       /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33
+
+
+>>>Processing clusterAndCoinHists.fcl.tmp ...
+
+>>>mv clusterAndCoinHists.fcl.tmp gm2offline_ana_0_24803.00484.fcl
+
+
+Thu Mar 26 12:43:11 CDT 2020
+
+
+>>>Producing one output file per job after consuming N input file(s) from https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 with process ID=17790134...
+
+
+>>>Running command:  gm2   -c gm2offline_ana_0_24803.00484.fcl -n -1 -e 1 --sam-web-uri=https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 --sam-process-id=17790134
+
+%MSG-i MF_INIT_OK:  Early 26-Mar-2020 12:43:12 CDT JobSetup
+Messagelogger initialization complete.
+%MSG
+%MSG-i path:  Early 26-Mar-2020 12:43:15 CDT JobSetup
+The following module labels are not assigned to any path:
+'backwardsClusterCoincidenceFinderTrunc', 'clusterCoincidenceFinderTrunc', 'hitClusterTrunc'
+
+%MSG
+IFDH constructor, got keys:
+service_type,
+IFDH: didn't find a base uri...
+
+IFCatalogInterface constructor, got keys:
+service_provider,
+service_type,
+webURI,
+IFCatalogInterface: setting _proj_uri to:https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202
+
+IFCatalogInterface doConfigure, got id:17790134
+IFCatalogInterface entering doGetNextFile
+
+doGetNextFile success
+
+IFFileTransfer: entered for uri: xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root
+
+IFFileTransfer: copied xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root to xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root
+
+IFCatalogInterface doUpdateStatus xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root status: 0
+
+26-Mar-2020 12:43:16 CDT  Initiating request to open input file "xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root"
+
+
+26-Mar-2020 12:44:40 CDT  Opened input file "xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root"
+parsing ODB
+finished parsing ODB
+generating calo maps
+finished generating calo maps
+Begin processing the 1st record. run: 24803 subRun: 484 event: 1 at 26-Mar-2020 12:45:13 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 1
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 1
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 1
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 1
+Begin processing the 2nd record. run: 24803 subRun: 484 event: 2 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 3rd record. run: 24803 subRun: 484 event: 3 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 3
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 3
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 3
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 3
+Begin processing the 4th record. run: 24803 subRun: 484 event: 4 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 5th record. run: 24803 subRun: 484 event: 5 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 5
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 5
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 5
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 5
+Begin processing the 6th record. run: 24803 subRun: 484 event: 6 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 7th record. run: 24803 subRun: 484 event: 7 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 7
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 7
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 7
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 7
+Begin processing the 8th record. run: 24803 subRun: 484 event: 8 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 9th record. run: 24803 subRun: 484 event: 9 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 9
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 9
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 9
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 9
+Begin processing the 10th record. run: 24803 subRun: 484 event: 10 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 11th record. run: 24803 subRun: 484 event: 11 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 11
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 11
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 11
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 11
+Begin processing the 12th record. run: 24803 subRun: 484 event: 12 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 13th record. run: 24803 subRun: 484 event: 13 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 13
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 13
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 13
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 13
+Begin processing the 14th record. run: 24803 subRun: 484 event: 14 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 15th record. run: 24803 subRun: 484 event: 15 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 15
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 15
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 15
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 15
+Begin processing the 16th record. run: 24803 subRun: 484 event: 16 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 17th record. run: 24803 subRun: 484 event: 17 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 17
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 17
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 17
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 17
+Begin processing the 18th record. run: 24803 subRun: 484 event: 18 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 19th record. run: 24803 subRun: 484 event: 19 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 20th record. run: 24803 subRun: 484 event: 20 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 21st record. run: 24803 subRun: 484 event: 21 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 21
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 21
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 21
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 21
+Begin processing the 22nd record. run: 24803 subRun: 484 event: 22 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 23rd record. run: 24803 subRun: 484 event: 23 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 23
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 23
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 23
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 23
+Begin processing the 24th record. run: 24803 subRun: 484 event: 24 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 25th record. run: 24803 subRun: 484 event: 25 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 25
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 25
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 25
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 25
+Begin processing the 26th record. run: 24803 subRun: 484 event: 26 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 27th record. run: 24803 subRun: 484 event: 27 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 27
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 27
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 27
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 27
+Begin processing the 28th record. run: 24803 subRun: 484 event: 28 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 29th record. run: 24803 subRun: 484 event: 29 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 29
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 29
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 29
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 29
+Begin processing the 30th record. run: 24803 subRun: 484 event: 30 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 31st record. run: 24803 subRun: 484 event: 31 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 31
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 31
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 31
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 31
+Begin processing the 32nd record. run: 24803 subRun: 484 event: 32 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 33rd record. run: 24803 subRun: 484 event: 33 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 33
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 33
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 33
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 33
+Begin processing the 34th record. run: 24803 subRun: 484 event: 34 at 26-Mar-2020 12:45:15 CDT
+Begin processing the 35th record. run: 24803 subRun: 484 event: 35 at 26-Mar-2020 12:45:15 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 35
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 35
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 35
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 35
+Begin processing the 36th record. run: 24803 subRun: 484 event: 36 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 37th record. run: 24803 subRun: 484 event: 37 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 37
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 37
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 37
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 37
+Begin processing the 38th record. run: 24803 subRun: 484 event: 38 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 39th record. run: 24803 subRun: 484 event: 39 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 39
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 39
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 39
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 39
+Begin processing the 40th record. run: 24803 subRun: 484 event: 40 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 41st record. run: 24803 subRun: 484 event: 41 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 41
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 41
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 41
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 41
+Begin processing the 42nd record. run: 24803 subRun: 484 event: 42 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 43rd record. run: 24803 subRun: 484 event: 43 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 43
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 43
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 43
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 43
+Begin processing the 44th record. run: 24803 subRun: 484 event: 44 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 45th record. run: 24803 subRun: 484 event: 45 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 45
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 45
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 45
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 45
+Begin processing the 46th record. run: 24803 subRun: 484 event: 46 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 47th record. run: 24803 subRun: 484 event: 47 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 47
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 47
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 47
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 47
+Begin processing the 48th record. run: 24803 subRun: 484 event: 48 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 49th record. run: 24803 subRun: 484 event: 49 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 49
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 49
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 49
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 49
+Begin processing the 50th record. run: 24803 subRun: 484 event: 50 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 51st record. run: 24803 subRun: 484 event: 51 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 51
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 51
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 51
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 51
+Begin processing the 52nd record. run: 24803 subRun: 484 event: 52 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 53rd record. run: 24803 subRun: 484 event: 53 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 54th record. run: 24803 subRun: 484 event: 54 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 55th record. run: 24803 subRun: 484 event: 55 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 55
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 55
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 55
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 55
+Begin processing the 56th record. run: 24803 subRun: 484 event: 56 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 57th record. run: 24803 subRun: 484 event: 57 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 57
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 57
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 57
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 57
+Begin processing the 58th record. run: 24803 subRun: 484 event: 58 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 59th record. run: 24803 subRun: 484 event: 59 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 59
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 59
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 59
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 59
+Begin processing the 60th record. run: 24803 subRun: 484 event: 60 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 61st record. run: 24803 subRun: 484 event: 61 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 61
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 61
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 61
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 61
+Begin processing the 62nd record. run: 24803 subRun: 484 event: 62 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 63rd record. run: 24803 subRun: 484 event: 63 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 63
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 63
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 63
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 63
+Begin processing the 64th record. run: 24803 subRun: 484 event: 64 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 65th record. run: 24803 subRun: 484 event: 65 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 65
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 65
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 65
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 65
+Begin processing the 66th record. run: 24803 subRun: 484 event: 66 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 67th record. run: 24803 subRun: 484 event: 67 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 67
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 67
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 67
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 67
+Begin processing the 68th record. run: 24803 subRun: 484 event: 68 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 69th record. run: 24803 subRun: 484 event: 69 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 69
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 69
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 69
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 69
+Begin processing the 70th record. run: 24803 subRun: 484 event: 70 at 26-Mar-2020 12:45:16 CDT
+Begin processing the 71st record. run: 24803 subRun: 484 event: 71 at 26-Mar-2020 12:45:16 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 71
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 71
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 71
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 71
+Begin processing the 72nd record. run: 24803 subRun: 484 event: 72 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 73rd record. run: 24803 subRun: 484 event: 73 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 73
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 73
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 73
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 73
+Begin processing the 74th record. run: 24803 subRun: 484 event: 74 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 75th record. run: 24803 subRun: 484 event: 75 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 75
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 75
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 75
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 75
+Begin processing the 76th record. run: 24803 subRun: 484 event: 76 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 77th record. run: 24803 subRun: 484 event: 77 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 77
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 77
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 77
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 77
+Begin processing the 78th record. run: 24803 subRun: 484 event: 78 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 79th record. run: 24803 subRun: 484 event: 79 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 79
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 79
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 79
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 79
+Begin processing the 80th record. run: 24803 subRun: 484 event: 80 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 81st record. run: 24803 subRun: 484 event: 81 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 81
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 81
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 81
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 81
+Begin processing the 82nd record. run: 24803 subRun: 484 event: 82 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 83rd record. run: 24803 subRun: 484 event: 83 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 83
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 83
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 83
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 83
+Begin processing the 84th record. run: 24803 subRun: 484 event: 84 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 85th record. run: 24803 subRun: 484 event: 85 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 85
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 85
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 85
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 85
+Begin processing the 86th record. run: 24803 subRun: 484 event: 86 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 87th record. run: 24803 subRun: 484 event: 87 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 88th record. run: 24803 subRun: 484 event: 88 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 89th record. run: 24803 subRun: 484 event: 89 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 89
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 89
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 89
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 89
+Begin processing the 90th record. run: 24803 subRun: 484 event: 90 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 91st record. run: 24803 subRun: 484 event: 91 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 91
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 91
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 91
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 91
+Begin processing the 92nd record. run: 24803 subRun: 484 event: 92 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 93rd record. run: 24803 subRun: 484 event: 93 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 93
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 93
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 93
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 93
+Begin processing the 94th record. run: 24803 subRun: 484 event: 94 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 95th record. run: 24803 subRun: 484 event: 95 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 95
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 95
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 95
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 95
+Begin processing the 96th record. run: 24803 subRun: 484 event: 96 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 97th record. run: 24803 subRun: 484 event: 97 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 97
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 97
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 97
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 97
+Begin processing the 98th record. run: 24803 subRun: 484 event: 98 at 26-Mar-2020 12:45:17 CDT
+Begin processing the 99th record. run: 24803 subRun: 484 event: 99 at 26-Mar-2020 12:45:17 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 99
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 99
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 99
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 99
+Begin processing the 100th record. run: 24803 subRun: 484 event: 100 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 101st record. run: 24803 subRun: 484 event: 101 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 101
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 101
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 101
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 101
+Begin processing the 102nd record. run: 24803 subRun: 484 event: 102 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 103rd record. run: 24803 subRun: 484 event: 103 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 103
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 103
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 103
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 103
+Begin processing the 104th record. run: 24803 subRun: 484 event: 104 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 105th record. run: 24803 subRun: 484 event: 105 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 105
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 105
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 105
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 105
+Begin processing the 106th record. run: 24803 subRun: 484 event: 106 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 107th record. run: 24803 subRun: 484 event: 107 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 107
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 107
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 107
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 107
+Begin processing the 108th record. run: 24803 subRun: 484 event: 108 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 109th record. run: 24803 subRun: 484 event: 109 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 109
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 109
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 109
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 109
+Begin processing the 110th record. run: 24803 subRun: 484 event: 110 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 111th record. run: 24803 subRun: 484 event: 111 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 111
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 111
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 111
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 111
+Begin processing the 112th record. run: 24803 subRun: 484 event: 112 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 113th record. run: 24803 subRun: 484 event: 113 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 113
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 113
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 113
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 113
+Begin processing the 114th record. run: 24803 subRun: 484 event: 114 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 115th record. run: 24803 subRun: 484 event: 115 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 115
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 115
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 115
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 115
+Begin processing the 116th record. run: 24803 subRun: 484 event: 116 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 117th record. run: 24803 subRun: 484 event: 117 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 117
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 117
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 117
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 117
+Begin processing the 118th record. run: 24803 subRun: 484 event: 118 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 119th record. run: 24803 subRun: 484 event: 119 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 119
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 119
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 119
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 119
+Begin processing the 120th record. run: 24803 subRun: 484 event: 120 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 121st record. run: 24803 subRun: 484 event: 121 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 122nd record. run: 24803 subRun: 484 event: 122 at 26-Mar-2020 12:45:18 CDT
+Begin processing the 123rd record. run: 24803 subRun: 484 event: 123 at 26-Mar-2020 12:45:18 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 123
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 123
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 123
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 123
+Begin processing the 124th record. run: 24803 subRun: 484 event: 124 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 125th record. run: 24803 subRun: 484 event: 125 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 125
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 125
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 125
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 125
+Begin processing the 126th record. run: 24803 subRun: 484 event: 126 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 127th record. run: 24803 subRun: 484 event: 127 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 127
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 127
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 127
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 127
+Begin processing the 128th record. run: 24803 subRun: 484 event: 128 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 129th record. run: 24803 subRun: 484 event: 129 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 129
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 129
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 129
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 129
+Begin processing the 130th record. run: 24803 subRun: 484 event: 130 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 131st record. run: 24803 subRun: 484 event: 131 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 131
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 131
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 131
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 131
+Begin processing the 132nd record. run: 24803 subRun: 484 event: 132 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 133rd record. run: 24803 subRun: 484 event: 133 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 133
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 133
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 133
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 133
+Begin processing the 134th record. run: 24803 subRun: 484 event: 134 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 135th record. run: 24803 subRun: 484 event: 135 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 135
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 135
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 135
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 135
+Begin processing the 136th record. run: 24803 subRun: 484 event: 136 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 137th record. run: 24803 subRun: 484 event: 137 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 137
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 137
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 137
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 137
+Begin processing the 138th record. run: 24803 subRun: 484 event: 138 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 139th record. run: 24803 subRun: 484 event: 139 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 139
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 139
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 139
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 139
+Begin processing the 140th record. run: 24803 subRun: 484 event: 140 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 141st record. run: 24803 subRun: 484 event: 141 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 141
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 141
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 141
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 141
+Begin processing the 142nd record. run: 24803 subRun: 484 event: 142 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 143rd record. run: 24803 subRun: 484 event: 143 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 143
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 143
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 143
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 143
+Begin processing the 144th record. run: 24803 subRun: 484 event: 144 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 145th record. run: 24803 subRun: 484 event: 145 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 145
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 145
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 145
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 145
+Begin processing the 146th record. run: 24803 subRun: 484 event: 146 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 147th record. run: 24803 subRun: 484 event: 147 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 147
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 147
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 147
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 147
+Begin processing the 148th record. run: 24803 subRun: 484 event: 148 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 149th record. run: 24803 subRun: 484 event: 149 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 149
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 149
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 149
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 149
+Begin processing the 150th record. run: 24803 subRun: 484 event: 150 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 151st record. run: 24803 subRun: 484 event: 151 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 151
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 151
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 151
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 151
+Begin processing the 152nd record. run: 24803 subRun: 484 event: 152 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 153rd record. run: 24803 subRun: 484 event: 153 at 26-Mar-2020 12:45:19 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 153
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 153
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 153
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 153
+Begin processing the 154th record. run: 24803 subRun: 484 event: 154 at 26-Mar-2020 12:45:19 CDT
+Begin processing the 155th record. run: 24803 subRun: 484 event: 155 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 156th record. run: 24803 subRun: 484 event: 156 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 157th record. run: 24803 subRun: 484 event: 157 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 157
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 157
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 157
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 157
+Begin processing the 158th record. run: 24803 subRun: 484 event: 158 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 159th record. run: 24803 subRun: 484 event: 159 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 159
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 159
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 159
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 159
+Begin processing the 160th record. run: 24803 subRun: 484 event: 160 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 161st record. run: 24803 subRun: 484 event: 161 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 161
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 161
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 161
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 161
+Begin processing the 162nd record. run: 24803 subRun: 484 event: 162 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 163rd record. run: 24803 subRun: 484 event: 163 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 163
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 163
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 163
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 163
+Begin processing the 164th record. run: 24803 subRun: 484 event: 164 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 165th record. run: 24803 subRun: 484 event: 165 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 165
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 165
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 165
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 165
+Begin processing the 166th record. run: 24803 subRun: 484 event: 166 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 167th record. run: 24803 subRun: 484 event: 167 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 167
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 167
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 167
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 167
+Begin processing the 168th record. run: 24803 subRun: 484 event: 168 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 169th record. run: 24803 subRun: 484 event: 169 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 169
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 169
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 169
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 169
+Begin processing the 170th record. run: 24803 subRun: 484 event: 170 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 171st record. run: 24803 subRun: 484 event: 171 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 171
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 171
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 171
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 171
+Begin processing the 172nd record. run: 24803 subRun: 484 event: 172 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 173rd record. run: 24803 subRun: 484 event: 173 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 173
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 173
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 173
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 173
+Begin processing the 174th record. run: 24803 subRun: 484 event: 174 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 175th record. run: 24803 subRun: 484 event: 175 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 175
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 175
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 175
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 175
+Begin processing the 176th record. run: 24803 subRun: 484 event: 176 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 177th record. run: 24803 subRun: 484 event: 177 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 177
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 177
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 177
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 177
+Begin processing the 178th record. run: 24803 subRun: 484 event: 178 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 179th record. run: 24803 subRun: 484 event: 179 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 179
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 179
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 179
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 179
+Begin processing the 180th record. run: 24803 subRun: 484 event: 180 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 181st record. run: 24803 subRun: 484 event: 181 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 181
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 181
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 181
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 181
+Begin processing the 182nd record. run: 24803 subRun: 484 event: 182 at 26-Mar-2020 12:45:20 CDT
+Begin processing the 183rd record. run: 24803 subRun: 484 event: 183 at 26-Mar-2020 12:45:20 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 183
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 183
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 183
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 183
+Begin processing the 184th record. run: 24803 subRun: 484 event: 184 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 185th record. run: 24803 subRun: 484 event: 185 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 185
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 185
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 185
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 185
+Begin processing the 186th record. run: 24803 subRun: 484 event: 186 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 187th record. run: 24803 subRun: 484 event: 187 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 187
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 187
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 187
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 187
+Begin processing the 188th record. run: 24803 subRun: 484 event: 188 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 189th record. run: 24803 subRun: 484 event: 189 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 190th record. run: 24803 subRun: 484 event: 190 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 191st record. run: 24803 subRun: 484 event: 191 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 191
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 191
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 191
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 191
+Begin processing the 192nd record. run: 24803 subRun: 484 event: 192 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 193rd record. run: 24803 subRun: 484 event: 193 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 193
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 193
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 193
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 193
+Begin processing the 194th record. run: 24803 subRun: 484 event: 194 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 195th record. run: 24803 subRun: 484 event: 195 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 195
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 195
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 195
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 195
+Begin processing the 196th record. run: 24803 subRun: 484 event: 196 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 197th record. run: 24803 subRun: 484 event: 197 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 197
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 197
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 197
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 197
+Begin processing the 198th record. run: 24803 subRun: 484 event: 198 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 199th record. run: 24803 subRun: 484 event: 199 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 199
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 199
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 199
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 199
+Begin processing the 200th record. run: 24803 subRun: 484 event: 200 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 201st record. run: 24803 subRun: 484 event: 201 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 201
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 201
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 201
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 201
+Begin processing the 202nd record. run: 24803 subRun: 484 event: 202 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 203rd record. run: 24803 subRun: 484 event: 203 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 203
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 203
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 203
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 203
+Begin processing the 204th record. run: 24803 subRun: 484 event: 204 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 205th record. run: 24803 subRun: 484 event: 205 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 205
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 205
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 205
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 205
+Begin processing the 206th record. run: 24803 subRun: 484 event: 206 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 207th record. run: 24803 subRun: 484 event: 207 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 207
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 207
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 207
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 207
+Begin processing the 208th record. run: 24803 subRun: 484 event: 208 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 209th record. run: 24803 subRun: 484 event: 209 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 209
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 209
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 209
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 209
+Begin processing the 210th record. run: 24803 subRun: 484 event: 210 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 211th record. run: 24803 subRun: 484 event: 211 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 211
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 211
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 211
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 211
+Begin processing the 212th record. run: 24803 subRun: 484 event: 212 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 213th record. run: 24803 subRun: 484 event: 213 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 213
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 213
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 213
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 213
+Begin processing the 214th record. run: 24803 subRun: 484 event: 214 at 26-Mar-2020 12:45:21 CDT
+Begin processing the 215th record. run: 24803 subRun: 484 event: 215 at 26-Mar-2020 12:45:21 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 215
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 215
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 215
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 215
+Begin processing the 216th record. run: 24803 subRun: 484 event: 216 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 217th record. run: 24803 subRun: 484 event: 217 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 217
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 217
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 217
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 217
+Begin processing the 218th record. run: 24803 subRun: 484 event: 218 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 219th record. run: 24803 subRun: 484 event: 219 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 219
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 219
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 219
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 219
+Begin processing the 220th record. run: 24803 subRun: 484 event: 220 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 221st record. run: 24803 subRun: 484 event: 221 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 221
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 221
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 221
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 221
+Begin processing the 222nd record. run: 24803 subRun: 484 event: 222 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 223rd record. run: 24803 subRun: 484 event: 223 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 224th record. run: 24803 subRun: 484 event: 224 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 225th record. run: 24803 subRun: 484 event: 225 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 225
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 225
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 225
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 225
+Begin processing the 226th record. run: 24803 subRun: 484 event: 226 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 227th record. run: 24803 subRun: 484 event: 227 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 227
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 227
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 227
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 227
+Begin processing the 228th record. run: 24803 subRun: 484 event: 228 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 229th record. run: 24803 subRun: 484 event: 229 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 229
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 229
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 229
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 229
+Begin processing the 230th record. run: 24803 subRun: 484 event: 230 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 231st record. run: 24803 subRun: 484 event: 231 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 231
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 231
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 231
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 231
+Begin processing the 232nd record. run: 24803 subRun: 484 event: 232 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 233rd record. run: 24803 subRun: 484 event: 233 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 233
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 233
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 233
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 233
+Begin processing the 234th record. run: 24803 subRun: 484 event: 234 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 235th record. run: 24803 subRun: 484 event: 235 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 235
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 235
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 235
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 235
+Begin processing the 236th record. run: 24803 subRun: 484 event: 236 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 237th record. run: 24803 subRun: 484 event: 237 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 237
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 237
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 237
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 237
+Begin processing the 238th record. run: 24803 subRun: 484 event: 238 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 239th record. run: 24803 subRun: 484 event: 239 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 239
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 239
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 239
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 239
+Begin processing the 240th record. run: 24803 subRun: 484 event: 240 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 241st record. run: 24803 subRun: 484 event: 241 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 241
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 241
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 241
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 241
+Begin processing the 242nd record. run: 24803 subRun: 484 event: 242 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 243rd record. run: 24803 subRun: 484 event: 243 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 243
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 243
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 243
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 243
+Begin processing the 244th record. run: 24803 subRun: 484 event: 244 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 245th record. run: 24803 subRun: 484 event: 245 at 26-Mar-2020 12:45:22 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 245
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 245
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 245
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 245
+Begin processing the 246th record. run: 24803 subRun: 484 event: 246 at 26-Mar-2020 12:45:22 CDT
+Begin processing the 247th record. run: 24803 subRun: 484 event: 247 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 247
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 247
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 247
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 247
+Begin processing the 248th record. run: 24803 subRun: 484 event: 248 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 249th record. run: 24803 subRun: 484 event: 249 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 249
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 249
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 249
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 249
+Begin processing the 250th record. run: 24803 subRun: 484 event: 250 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 251st record. run: 24803 subRun: 484 event: 251 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 251
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 251
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 251
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 251
+Begin processing the 252nd record. run: 24803 subRun: 484 event: 252 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 253rd record. run: 24803 subRun: 484 event: 253 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 253
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 253
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 253
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 253
+Begin processing the 254th record. run: 24803 subRun: 484 event: 254 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 255th record. run: 24803 subRun: 484 event: 255 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 255
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 255
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 255
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 255
+Begin processing the 256th record. run: 24803 subRun: 484 event: 256 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 257th record. run: 24803 subRun: 484 event: 257 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 258th record. run: 24803 subRun: 484 event: 258 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 259th record. run: 24803 subRun: 484 event: 259 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 259
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 259
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 259
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 259
+Begin processing the 260th record. run: 24803 subRun: 484 event: 260 at 26-Mar-2020 12:45:23 CDT
+Begin processing the 261st record. run: 24803 subRun: 484 event: 261 at 26-Mar-2020 12:45:23 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 261
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 261
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 261
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 261
+Begin processing the 262nd record. run: 24803 subRun: 484 event: 262 at 26-Mar-2020 12:45:24 CDT
+Begin processing the 263rd record. run: 24803 subRun: 484 event: 263 at 26-Mar-2020 12:45:24 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 263
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 263
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 263
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 263
+Begin processing the 264th record. run: 24803 subRun: 484 event: 264 at 26-Mar-2020 12:45:24 CDT
+Begin processing the 265th record. run: 24803 subRun: 484 event: 265 at 26-Mar-2020 12:45:24 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 265
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 265
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 265
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 265
+Begin processing the 266th record. run: 24803 subRun: 484 event: 266 at 26-Mar-2020 12:45:24 CDT
+Begin processing the 267th record. run: 24803 subRun: 484 event: 267 at 26-Mar-2020 12:45:24 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 267
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 267
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 267
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 267
+Begin processing the 268th record. run: 24803 subRun: 484 event: 268 at 26-Mar-2020 12:45:25 CDT
+Begin processing the 269th record. run: 24803 subRun: 484 event: 269 at 26-Mar-2020 12:45:25 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 269
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 269
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 269
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 269
+Begin processing the 270th record. run: 24803 subRun: 484 event: 270 at 26-Mar-2020 12:45:25 CDT
+Begin processing the 271st record. run: 24803 subRun: 484 event: 271 at 26-Mar-2020 12:45:25 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 271
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 271
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 271
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 271
+Begin processing the 272nd record. run: 24803 subRun: 484 event: 272 at 26-Mar-2020 12:45:25 CDT
+Begin processing the 273rd record. run: 24803 subRun: 484 event: 273 at 26-Mar-2020 12:45:25 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 273
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 273
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 273
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 273
+Begin processing the 274th record. run: 24803 subRun: 484 event: 274 at 26-Mar-2020 12:45:25 CDT
+Begin processing the 275th record. run: 24803 subRun: 484 event: 275 at 26-Mar-2020 12:45:25 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 275
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 275
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 275
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 275
+Begin processing the 276th record. run: 24803 subRun: 484 event: 276 at 26-Mar-2020 12:45:25 CDT
+Begin processing the 277th record. run: 24803 subRun: 484 event: 277 at 26-Mar-2020 12:45:25 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 277
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 277
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 277
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 277
+Begin processing the 278th record. run: 24803 subRun: 484 event: 278 at 26-Mar-2020 12:45:26 CDT
+Begin processing the 279th record. run: 24803 subRun: 484 event: 279 at 26-Mar-2020 12:45:26 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 279
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 279
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 279
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 279
+Begin processing the 280th record. run: 24803 subRun: 484 event: 280 at 26-Mar-2020 12:45:26 CDT
+Begin processing the 281st record. run: 24803 subRun: 484 event: 281 at 26-Mar-2020 12:45:26 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 281
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 281
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 281
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 281
+Begin processing the 282nd record. run: 24803 subRun: 484 event: 282 at 26-Mar-2020 12:45:26 CDT
+Begin processing the 283rd record. run: 24803 subRun: 484 event: 283 at 26-Mar-2020 12:45:26 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 283
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 283
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 283
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 283
+Begin processing the 284th record. run: 24803 subRun: 484 event: 284 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 285th record. run: 24803 subRun: 484 event: 285 at 26-Mar-2020 12:45:27 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 285
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 285
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 285
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 285
+Begin processing the 286th record. run: 24803 subRun: 484 event: 286 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 287th record. run: 24803 subRun: 484 event: 287 at 26-Mar-2020 12:45:27 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 287
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 287
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 287
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 287
+Begin processing the 288th record. run: 24803 subRun: 484 event: 288 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 289th record. run: 24803 subRun: 484 event: 289 at 26-Mar-2020 12:45:27 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 289
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 289
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 289
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 289
+Begin processing the 290th record. run: 24803 subRun: 484 event: 290 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 291st record. run: 24803 subRun: 484 event: 291 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 292nd record. run: 24803 subRun: 484 event: 292 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 293rd record. run: 24803 subRun: 484 event: 293 at 26-Mar-2020 12:45:27 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 293
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 293
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 293
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 293
+Begin processing the 294th record. run: 24803 subRun: 484 event: 294 at 26-Mar-2020 12:45:27 CDT
+Begin processing the 295th record. run: 24803 subRun: 484 event: 295 at 26-Mar-2020 12:45:27 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 295
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 295
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 295
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 295
+Begin processing the 296th record. run: 24803 subRun: 484 event: 296 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 297th record. run: 24803 subRun: 484 event: 297 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 297
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 297
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 297
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 297
+Begin processing the 298th record. run: 24803 subRun: 484 event: 298 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 299th record. run: 24803 subRun: 484 event: 299 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 299
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 299
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 299
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 299
+Begin processing the 300th record. run: 24803 subRun: 484 event: 300 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 301st record. run: 24803 subRun: 484 event: 301 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 301
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 301
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 301
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 301
+Begin processing the 302nd record. run: 24803 subRun: 484 event: 302 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 303rd record. run: 24803 subRun: 484 event: 303 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 303
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 303
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 303
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 303
+Begin processing the 304th record. run: 24803 subRun: 484 event: 304 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 305th record. run: 24803 subRun: 484 event: 305 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 305
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 305
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 305
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 305
+Begin processing the 306th record. run: 24803 subRun: 484 event: 306 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 307th record. run: 24803 subRun: 484 event: 307 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 307
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 307
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 307
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 307
+Begin processing the 308th record. run: 24803 subRun: 484 event: 308 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 309th record. run: 24803 subRun: 484 event: 309 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 309
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 309
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 309
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 309
+Begin processing the 310th record. run: 24803 subRun: 484 event: 310 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 311th record. run: 24803 subRun: 484 event: 311 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 311
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 311
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 311
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 311
+Begin processing the 312th record. run: 24803 subRun: 484 event: 312 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 313th record. run: 24803 subRun: 484 event: 313 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 313
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 313
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 313
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 313
+Begin processing the 314th record. run: 24803 subRun: 484 event: 314 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 315th record. run: 24803 subRun: 484 event: 315 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 315
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 315
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 315
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 315
+Begin processing the 316th record. run: 24803 subRun: 484 event: 316 at 26-Mar-2020 12:45:28 CDT
+Begin processing the 317th record. run: 24803 subRun: 484 event: 317 at 26-Mar-2020 12:45:28 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 317
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 317
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 317
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 317
+Begin processing the 318th record. run: 24803 subRun: 484 event: 318 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 319th record. run: 24803 subRun: 484 event: 319 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 319
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 319
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 319
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 319
+Begin processing the 320th record. run: 24803 subRun: 484 event: 320 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 321st record. run: 24803 subRun: 484 event: 321 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 321
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 321
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 321
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 321
+Begin processing the 322nd record. run: 24803 subRun: 484 event: 322 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 323rd record. run: 24803 subRun: 484 event: 323 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 323
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 323
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 323
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 323
+Begin processing the 324th record. run: 24803 subRun: 484 event: 324 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 325th record. run: 24803 subRun: 484 event: 325 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 326th record. run: 24803 subRun: 484 event: 326 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 327th record. run: 24803 subRun: 484 event: 327 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 327
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 327
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 327
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 327
+Begin processing the 328th record. run: 24803 subRun: 484 event: 328 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 329th record. run: 24803 subRun: 484 event: 329 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 329
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 329
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 329
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 329
+Begin processing the 330th record. run: 24803 subRun: 484 event: 330 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 331st record. run: 24803 subRun: 484 event: 331 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 331
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 331
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 331
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 331
+Begin processing the 332nd record. run: 24803 subRun: 484 event: 332 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 333rd record. run: 24803 subRun: 484 event: 333 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 333
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 333
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 333
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 333
+Begin processing the 334th record. run: 24803 subRun: 484 event: 334 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 335th record. run: 24803 subRun: 484 event: 335 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 335
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 335
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 335
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 335
+Begin processing the 336th record. run: 24803 subRun: 484 event: 336 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 337th record. run: 24803 subRun: 484 event: 337 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 337
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 337
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 337
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 337
+Begin processing the 338th record. run: 24803 subRun: 484 event: 338 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 339th record. run: 24803 subRun: 484 event: 339 at 26-Mar-2020 12:45:29 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 339
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 339
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 339
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 339
+Begin processing the 340th record. run: 24803 subRun: 484 event: 340 at 26-Mar-2020 12:45:29 CDT
+Begin processing the 341st record. run: 24803 subRun: 484 event: 341 at 26-Mar-2020 12:45:30 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 341
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 341
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 341
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 341
+Begin processing the 342nd record. run: 24803 subRun: 484 event: 342 at 26-Mar-2020 12:45:30 CDT
+Begin processing the 343rd record. run: 24803 subRun: 484 event: 343 at 26-Mar-2020 12:45:30 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 343
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 343
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 343
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 343
+Begin processing the 344th record. run: 24803 subRun: 484 event: 344 at 26-Mar-2020 12:45:30 CDT
+Begin processing the 345th record. run: 24803 subRun: 484 event: 345 at 26-Mar-2020 12:45:30 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 345
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 345
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 345
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 345
+Begin processing the 346th record. run: 24803 subRun: 484 event: 346 at 26-Mar-2020 12:45:30 CDT
+Begin processing the 347th record. run: 24803 subRun: 484 event: 347 at 26-Mar-2020 12:45:30 CDT
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 347
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 347
+Enter gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 347
+Exit gm2calo::ClusterCoincidenceFinder for run: 24803 subRun: 484 event: 347
+Begin processing the 348th record. run: 24803 subRun: 484 event: 348 at 26-Mar-2020 12:45:30 CDT
+IFCatalogInterface doUpdateStatus xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root status: 1
+
+unlink of file returns:-1
+
+IFCatalogInterface entering doGetNextFile
+
+doGetNextFile no_more_files
+
+26-Mar-2020 12:45:37 CDT  Closed input file "xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/GM2/daq/run2/offline/gm2_5109A/runs_24000/24803/gm2offline_final_30233369_24803.00484.root"
+
+=========================================================================================================================================================
+TimeTracker printout (sec)                                                 Min           Avg           Max         Median          RMS         nEvts
+=========================================================================================================================================================
+Full event                                                              0.0011609     0.0472686      1.11365      0.0267555     0.0887795       348
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+source:RootInput(read)                                                 0.000423346   0.000887871    0.0254723    0.000600248   0.00247122       348
+muonPath:muonFilter:CCCTriggerTypeFilter                               0.000642362    0.0197421     0.612276      0.0169558     0.0325049       348
+muonPath:clusterCoincidenceFinder:ClusterCoincidenceFinder             0.000666392    0.0556211     0.634767      0.0249909     0.0942657       164
+muonPath:backwardsClusterCoincidenceFinder:ClusterCoincidenceFinder    4.0463e-05    4.87711e-05   9.2795e-05    4.64575e-05   7.00582e-06      164
+muonPath:TriggerResults:TriggerResultInserter                          1.6602e-05    3.34161e-05   7.5318e-05    3.5782e-05    1.44656e-05      348
+end_path:clustersAndCoincidences:ClusterAndCoincidenceHistograms       1.6698e-05    0.000330125    0.0498335    3.8743e-05    0.00327168       348
+=========================================================================================================================================================
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 348 passed = 164 failed = 184
+
+TrigReport ------ Modules in End-Path: end_path ------------
+TrigReport  Trig Bit#        Run    Success      Error Name
+TrigReport     0    0        148        148          0 clustersAndCoincidences
+
+TimeReport ---------- Time  Summary ---[sec]----
+TimeReport CPU = 2.097681 Real = 27.111922
+
+MemReport  ---------- Memory  Summary ---[base-10 MB]----
+MemReport  VmPeak = 2917.15 VmHWM = 1801.35
+
+IFCatalogInterface destructor:
+Art has completed and will exit with status 0.
+
+>>>gm2offline_ana_0_24803.00484.fcl command exit status: 0, success!
+
+
+Thu Mar 26 12:45:45 CDT 2020
+
+>>>Copying over results to /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33 ...
+
+ifdh cp -D gm2offline_ana_0_24803.00484.fcl /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33/fcl
+ifdh cp -D gm2offline_ana_0_24803.00484.log /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33/logs
+ifdh cp -D gm2offline_ana_0_24803.00484.root /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33/data
+
+>>>Finished copying over the job log, fcl, and root files to /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33 ...
+
+
+Thu Mar 26 12:46:00 CDT 2020
+
+
+>>>ifdh setStatus https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 17790134 completed
+
+>>>ifdh endProcess https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202 17790134
+
+>>>ifdh endProject https://samwebgpvm03.fnal.gov:8483/sam/gm2/stations/gm2/projects/name/labounty_2020032612_4202
+
+
+Thu Mar 26 12:46:09 CDT 2020
+
+>>>Copying over environment log to /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33/logs ...
+
+ifdh cp -D env_0_run24803.00484.log /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33/logs
+
+Copied submission.log to /pnfs/GM2/scratch/users/labounty/gridoutput/2020-03-26-12-42-33 and linked to it.
+
+Questions and/or problems? see https://cdcvs.fnal.gov/redmine/projects/g-2/wiki/Job_Running_Submission_FAQ for additional help.
+
+Done.
+labounty@gm2gpvm04 gridsubmit $
+labounty@gm2gpvm04 gridsubmit $
+labounty@gm2gpvm04 gridsubmit $

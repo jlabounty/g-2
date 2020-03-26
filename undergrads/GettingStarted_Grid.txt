@@ -1,0 +1,72 @@
+Now that we've installed everything and gotten familiar with how to run the g-2 software from the command line, lets take it a step forward and start running on the grid. The first things you will need to do is get the 'grid submission scripts'. These were written by a number of g-2 collaborators for the purpose of making our lives submitting things to the grid easier. So navigate to your working directory:
+    cd /path/to/gm2/running/directory/ #for me, it's /gm2/app/users/labounty/work/test/
+    source localProducts_gm2_vX_XX_XX_prof/setup
+    . mrb s
+    #if you haven't run 'mrb i' before, do it now
+    mrb i --generator ninja
+    
+Now get the submission scripts:
+    mkdir gridsubmit
+    cd gridsubmit
+    cp /gm2/app/users/liangli/submission_scripts/* . #you can also find versions under gm2analyses/ProductionScripts/produce/ 
+    cp ../../srcs/gm2analyses/ProductionScripts/setup .
+
+You can take a look through these if you want, but most treat them like a 'black box' (and they are VERY hard to understand). Now in order to submit something to the grid, we have to setup our environment:
+    source ./setup
+    unsetup python #this line may or may not be necessary. If you get a 'pycurl' error without it, this will fix it.
+    
+Now we can submit something to the grid. I like to keep a file/notebook with my commands written down so that I don't have to type this out each and every time, but an example of a command you can run is:
+    ./gridSetupAndSubmitGM2Data.sh --daq --ana --fhicl clusterAndCoinHists.fcl  --sam-dataset gm2pro_daq_offline_run2_Prod_C  --njobs 400 --output-dir /pnfs/GM2/scratch/users/labounty/gridoutput --localArea --memory 3 --lifetime 24h 
+    
+Lets break this down by command:
+    ./gridSetupAndSubmitGM2Data.sh -> This is the script that submits the jobs for us
+    --daq --ana -> these tags tell the grid what type of analysis we are doing. They have to match the format of your output file. For instance, in this fcl file, I have:
+        TFileService:{
+            fileName:"gm2offline_ana.root"
+        }
+        to match the ana in the tag. 
+    --fhicl clusterAndCoinHists.fcl -> This is the fcl file we are submitting to the grid. It should be copied or symlinked (my preferred method) to this gridsubmit folder
+    --sam-dataset gm2pro_daq_offline_run2_Prod_C  
+        This is the SAM dataset we are using for this analysis. More on those, and some useful commands, in a minute. For now, just know that this corresponds to a list of files.
+    --njobs 400 -> The number of grid slots you are requesting.
+    --output-dir /pnfs/GM2/scratch/users/labounty/gridoutput -> Where you would like the output to be saved. The script will screate a subfolder within this specified output directory with the date of submission (e.g. 2020-03-11-09-11-56 ) where your output will be stored
+    --localArea -> This tells the script that we want to use the area we've done '. mrb s' on, and not the default g-2 installation
+    --memory 3 --lifetime 24h -> How much memory / time you are requesting. The default is 2 GB / 8 hours, and if your job goes above what you've requested it will be held.
+    
+Now you can try to run this with your own fcl file at this point. But it is often useful to make sure something will run on the grid before submitting. For that, we can use the '--noGrid' option when submitting. This will run a single job locally as if your terminal were a grid node. Then you can look at the output and make sure it is what you're expecting. To do this, in a fresh terminal:
+    cd /path/to/gm2/
+    source localProducts_gm2_vX_XX_XX_prof/setup
+    *****DO NOT . mrb s*****
+    cd gridsubmit/
+    ./gridSetupAndSubmitGM2Data.sh --daq --ana --fhicl clusterAndCoinHists.fcl  --sam-dataset gm2pro_daq_offline_run2_Prod_C  --njobs 400 --output-dir /pnfs/GM2/scratch/users/labounty/gridoutput --localArea --memory 3 --lifetime 24h --noGrid --sam-max-files 1
+This is also a useful tool, because you can see what's actually happening on the grid nodes on your terminal. For an example, see grid_output_local_example.txt in this folder.
+
+Other useful grid submission options:
+    --sam-max-files XXX -> replace XXX with an integer number of files. Each grid job will then exit after processing that many. Useful if you only want a random subset of files or you are worried about hitting your --lifetime limit.
+    
+Two things from the terminal output you'll want to make note of:
+    Output directory: /pnfs/GM2/scratch/users/labounty/gridoutput/XXX-> Where your files will be stored
+    A URL starting with: https://samweb.fnal.gov:8483/station_monitor/gm2/stations/gm2/projects/ -> This will take you to a webpage where you can track your jobs. 
+    
+To track your jobs while they are running, you can go to that URL or use the jobsub_q command:
+    jobsub_q --user labounty -> check the jobs for the user 'labounty'
+    I have the following command in my .bashrc
+        function checkmyjobs
+        {
+            output="$(jobsub_q--userlabounty)"
+            #echo"$output"
+            echo"`echo"$output"|head`"
+            echo"..."
+            echo"`echo"$output"|tail`"
+        }
+    which I find useful.
+
+Before running with the full grid machinery, it is also often useful to grab one file from a dataset or to see what is inside one. For that, there are a number of sam commands
+    Reference: https://cdcvs.fnal.gov/redmine/projects/sam-main/wiki/Sam_web_client_Command_Reference#samweb-base-options-count-files-command-options-ltdimensions-querygt
+    Some of my favorites:
+        samweb -e gm2 count-definition-files 'rfRuns_run3_nearline_34843_34846' -> how many files are in a dataset. Useful for determining how many jobs you need
+        samweb -e gm2 list-definition-files gm2pro_daq_offline_run2_Prod_C  -> lists files in a dataset
+        samweb -e gm2 locate-file gm2offline_final_29971157_24711.00195.root -> tells you the location of any file in a sam dataset
+        samweb -e gm2 prestage-dataset --defname=rfRuns_run3_nearline_34843_34846 --parallel 2   -> if a dataset hasn't been used in a while, it might be in long term (read: VERY slow) storage. This command brings the files back into disks which can be easily accessed to prevent read/write  or timeout errors when you are running on the grid. I would run this before any big grid submission unless I knew the dataset had been accessed recently (within the last week).
+        
+        
