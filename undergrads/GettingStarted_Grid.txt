@@ -24,7 +24,7 @@ Lets break this down by command:
         TFileService:{
             fileName:"gm2offline_ana.root"
         }
-        to match the ana in the tag. 
+        to match the --ana in these tags. 
     --fhicl clusterAndCoinHists.fcl -> This is the fcl file we are submitting to the grid. It should be copied or symlinked (my preferred method) to this gridsubmit folder
     --sam-dataset gm2pro_daq_offline_run2_Prod_C  
         This is the SAM dataset we are using for this analysis. More on those, and some useful commands, in a minute. For now, just know that this corresponds to a list of files.
