@@ -1008,15 +1008,24 @@ def flatten2dArray(input):
     return new_list
 
 
-def createSamDataset(name, runs, extraConditions = "", dataType = 'raw'):
+def createSamDataset(name, runs, extraConditions = "", dataType = 'raw', datasetType='runs'):
     '''
 	Outputs a string which will create a SAM dataset with the given name.
+    Accepted types:
+        "runs" = Will list all runs individually
+        "range" = Will only take 2 runs and then do >= / <= with them.
     '''
     dataset = 'samweb -e gm2 create-definition '+str(name)+' " ( '
-    for i, runi in enumerate(runs):
-        #dataset+= "( run_number >= "+str(runi)+" and run_number <= "+str(runi)+" ) or "
-        dataset+= "( run_number = "+str(runi)+" ) or "
-    dataset = dataset[:-3]+" "
+    if(datasetType is "runs"):
+        for i, runi in enumerate(runs):
+            #dataset+= "( run_number >= "+str(runi)+" and run_number <= "+str(runi)+" ) or "
+            dataset+= "( run_number = "+str(runi)+" ) or "
+        dataset = dataset[:-3]+" "
+    elif(datasetType is "range"):
+        dataset+= "(run_number >= "+str(runs[0])+" and run_number <= "+str(runs[1])+")"
+    else:
+        raise ValueError("ERROR: Dataset type not recognized")
+        return -1
     if(len(extraConditions) > 0):
         dataset += ' and ( '+str(extraConditions)+' ) '
     dataset += ') and data_tier '+str(dataType)+' " '
@@ -1311,13 +1320,15 @@ def fitVector(x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit 
     
     fnew = function#.Clone()
     gri = r.TGraphErrors()
+    pointi = 0
     for i in range(len(x)):
         if("Timestamp" in str(type(x[i]))):
             x[i] = int(time.mktime(x[i].timetuple()))
-        gri.SetPoint(i,x[i],y[i])
-        #print(x[i], y[i])
-        if(xerr is not None):
-            gri.SetPointError(i, xerr[i], yerr[i])
+        if(y[i] is not np.nan):
+            gri.SetPoint(pointi,x[pointi],y[pointi])
+            if(yerr is not None):
+                gri.SetPointError(pointi, xerr[pointi], yerr[pointi])
+            pointi += 1
     for i in range(nFit):
         fitresult = gri.Fit(fnew, fitoptions+"S")
         
@@ -1326,8 +1337,16 @@ def fitVector(x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit 
     if (len(x) == len(fitresult.GetConfidenceIntervals(0.95))):
         conf_int = [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
     else:
+        x1 = r.Double()
+        x2 = r.Double()
+
+        fnew.GetRange(x1,x2)
+        #print(x1,x2)
+        conf_int_x = [xi for xi in x if(xi >= x1 and xi <= x2)]
+        conf_int_y = [fnew.Eval(xi) for xi in conf_int_x]
         #conf_int = [0 for i in range(len(x))]
-        conf_int = [ len(fitresult.GetConfidenceIntervals(0.95)), 
+        conf_int = [ conf_int_x, 
+                    conf_int_y,
                     [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
         
     #get the fit parameters and associated errors
@@ -1343,7 +1362,8 @@ def fitVector(x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit 
     for xi in x:
         fitx.append(fnew.Eval(xi))
     #print("hi")
-    return(fitx, (pars, parErrs), chiSq, gri, fnew, cov, conf_int)
+    return(fitx, (pars, parErrs), chiSq, gri, fnew, cov, conf_int, x)
+
 
 def TF1toVector( func, xlow, xhigh, npoints ):
     yvec = []
@@ -1394,21 +1414,52 @@ def labelFit(pars, parErrs, parNames=None, chiSquare = None, functionString=None
         
     return parstring
 
-def drawConfidenceIntervals( ax, xvals, fitresult, color='blue',labeli=None, drawHist=True):
-    if(len(fitresult[6]) is not 2):
+def drawConfidenceIntervals( ax, fitresult, color='blue',labeli=None, drawHist=True):
+    if(len(fitresult[6]) is not 3):
+        xvals = fitresult[7]
         conf_int_high = [x+y for (x,y) in zip(fitresult[0], fitresult[6])]
         conf_int_low = [x-y for (x,y) in zip(fitresult[0], fitresult[6])]
 
         xvals_sorted, conf_int_high_sorted = zip(*sorted(zip(xvals, conf_int_high)))
         xvals_sorted, conf_int_low_sorted = zip(*sorted(zip(xvals, conf_int_low)))
-
-        #ax.plot(xvals_sorted, conf_int_high_sorted)
-        #ax.plot(xvals_sorted, conf_int_low_sorted)
-        if(drawHist):
-            ax.fill_between(xvals_sorted, conf_int_high_sorted, conf_int_low_sorted,
-                           facecolor=color, interpolate=True,
-                           alpha = 0.2,
-                           label=labeli)
-        return( xvals_sorted, conf_int_high_sorted, conf_int_low_sorted )
     else:
-        print("ERROR: Confidence interval length does not match data length")
+        xvals = fitresult[6][0]
+        #print("Warning: Confidence interval length does not match data length")
+        conf_int_high = [x+y for (x,y) in zip(fitresult[6][1], fitresult[6][2])]
+        conf_int_low = [x-y for (x,y) in zip(fitresult[6][1], fitresult[6][2])]
+
+        xvals_sorted, conf_int_high_sorted = zip(*sorted(zip(xvals, conf_int_high)))
+        xvals_sorted, conf_int_low_sorted = zip(*sorted(zip(xvals, conf_int_low)))
+
+    #ax.plot(xvals_sorted, conf_int_high_sorted)
+    #ax.plot(xvals_sorted, conf_int_low_sorted)
+    if(drawHist):
+        ax.fill_between(xvals_sorted, conf_int_high_sorted, conf_int_low_sorted,
+                       facecolor=color, interpolate=True,
+                       alpha = 0.2,
+                       label=labeli)
+    return( xvals_sorted, conf_int_high_sorted, conf_int_low_sorted )
+        
+        
+        
+def drawFitResult(ax, fitresult, scaleFactor=100, drawFormat="-", label="Default"):
+    #print(fitresult)
+    '''
+        Draws a fit result object returned by fitVector function on 'ax' (axes or plot from matplotlib)
+    '''
+    if(scaleFactor > 1):
+        x0 = fitresult[7][0]
+        xn = fitresult[7][len(fitresult[7])-1]
+        xs = np.linspace(x0,xn,scaleFactor)
+        ys = [fitresult[4].Eval(xi) for xi in xs]
+    else:
+        xs = fitresult[7]
+        ys = fitresult[0]
+    
+    if(label == "Default"):
+        labelString = labelFit(fitresult[1][0], fitresult[1][1], None, fitresult[2]) 
+    else:
+        labelString = label
+    
+    ax.plot(xs,ys,drawFormat,label=labelString)
+    
