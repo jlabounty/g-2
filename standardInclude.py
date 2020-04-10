@@ -29,12 +29,29 @@ import uncertainties
 import time
 from datetime import datetime
 
+import textwrap
+
+
 #PyROOT
 import ROOT as r
 r.gStyle.SetOptStat(0)
 r.gStyle.SetOptFit(1111)
 r.gStyle.SetPalette(112)
 r.gStyle.SetNumberContours(80)
+
+#Set g-2 plot style in python
+import mplhep as hep # required to set the required style
+def enable_atlas_python():
+    '''
+        Enables atlas style in ROOT and Matplotlib
+    '''
+    plt.style.use(hep.style.ATLAS)
+    plt.style.use({"axes.labelsize":'20'})
+    #and in root
+def enable_atlas_root():
+    #r.gROOT.SetStyle('ATLAS')
+    r.gROOT.LoadMacro("/home/jlab/github/gm2papers/styles/Root/gm2Style.C") 
+    r.gROOT.ProcessLine("SetGm2Style()")
 
 #g-2 Blinding Software
 from BlindersPy3 import Blinders
@@ -43,7 +60,7 @@ from BlindersPy3 import FitType
 #PyROOT Utilities
 import uproot # https://indico.cern.ch/event/686641/contributions/2894906/attachments/1606247/2548596/pivarski-uproot.pdf
 from awkward import JaggedArray
-from root_pandas import read_root # https://github.com/scikit-hep/root_pandas
+#from root_pandas import read_root # https://github.com/scikit-hep/root_pandas
 
 #Try to prevent warnings from bring spammed in loops
 import warnings
@@ -1116,11 +1133,18 @@ def THnToPython(h):
     histDict = {}
     histType = str(type(h))
     #print(histType)
-    if("ROOT.TH") not in histType:
+    if("ROOT.TH" not in histType and "ROOT.TProfile" not in histType):
         print("ERROR: Not a ROOT THn Object")
         return -1
-    histDimension = int(histType.split("ROOT.TH")[1].split("'")[0][0])
-    histDataType = histType.split("ROOT.TH")[1].split("'")[0][1]
+    if("ROOT.TH" in histType):
+        histDimension = int(histType.split("ROOT.TH")[1].split("'")[0][0])
+        histDataType = histType.split("ROOT.TH")[1].split("'")[0][1]
+    elif("ROOT.TProfile" in histType):
+        histDimension = 1
+        histDataType = "D"
+    else:
+        print("ERROR: dimension?")
+        return -1
     #print(histDimension, histDataType)
     histDict['dimension'] = histDimension
     histDict['dataType'] = histDataType
@@ -1307,64 +1331,6 @@ def stringToListOfFloats( string, verbosity = 0 ):
     return(ding)
 
 
-def fitVector(x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit = 2, function_python=None):
-    '''
-        Dumps a python vector of x and y points into a TGraph, then fits with the TF1 function and returns the fit result
-    '''
-    
-    x = list(x)
-    y = list(y)
-    if(xerr is not None):
-        xerr = list(xerr)
-        yerr = list(yerr)
-    
-    fnew = function#.Clone()
-    gri = r.TGraphErrors()
-    pointi = 0
-    for i in range(len(x)):
-        if("Timestamp" in str(type(x[i]))):
-            x[i] = int(time.mktime(x[i].timetuple()))
-        if(y[i] is not np.nan):
-            gri.SetPoint(pointi,x[pointi],y[pointi])
-            if(yerr is not None):
-                gri.SetPointError(pointi, xerr[pointi], yerr[pointi])
-            pointi += 1
-    for i in range(nFit):
-        fitresult = gri.Fit(fnew, fitoptions+"S")
-        
-    cov = fitresult.GetCovarianceMatrix()
-    #conf_int = r.Double()
-    if (len(x) == len(fitresult.GetConfidenceIntervals(0.95))):
-        conf_int = [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
-    else:
-        x1 = r.Double()
-        x2 = r.Double()
-
-        fnew.GetRange(x1,x2)
-        #print(x1,x2)
-        conf_int_x = [xi for xi in x if(xi >= x1 and xi <= x2)]
-        conf_int_y = [fnew.Eval(xi) for xi in conf_int_x]
-        #conf_int = [0 for i in range(len(x))]
-        conf_int = [ conf_int_x, 
-                    conf_int_y,
-                    [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
-        
-    #get the fit parameters and associated errors
-    pars = []
-    parErrs = []
-    for i in range(fnew.GetNpar()):
-        pars.append( fnew.GetParameter(i) )
-        parErrs.append( fnew.GetParError(i) )
-    chiSq = (fnew.GetChisquare() / fnew.GetNDF())
-        
-    #create a vector of y-points at each of the x points with the fitted function
-    fitx = []
-    for xi in x:
-        fitx.append(fnew.Eval(xi))
-    #print("hi")
-    return(fitx, (pars, parErrs), chiSq, gri, fnew, cov, conf_int, x)
-
-
 def TF1toVector( func, xlow, xhigh, npoints ):
     yvec = []
     xvec = []
@@ -1397,69 +1363,24 @@ def corellationMatrixFromCovariance( cov ):
             array[i][j] = cov[i][j]/(np.sqrt(cov[i][i]) * np.sqrt(cov[j][j])) #https://www.mathworks.com/help/symbolic/mupad_ref/stats-correlationmatrix.html
     return array
 
-def labelFit(pars, parErrs, parNames=None, chiSquare = None, functionString=None, formatStr="7.3E"):
-    if(parNames is None):
-        parNames = ["p"+str(i) for i in range(len(pars))]
-    parstring = "Fit Result"+"\n"
-    if(functionString is not None):
-        parstring+="Function: "+functionString+"\n"
-    for i in range(len(pars)):
-        parstring += str(parNames[i])+"\t= "+str(format(pars[i], formatStr))
-        if(parErrs is not None):
-            parstring += "\t"+r"$\pm$ "+str(format(parErrs[i], formatStr))+"\n"
-        else:
-            parstring += "\n"
-    if(chiSquare is not None):
-        parstring += r"$\chi^{2}/NDF$ = "+str(chiSquare)
-        
-    return parstring
 
-def drawConfidenceIntervals( ax, fitresult, color='blue',labeli=None, drawHist=True):
-    if(len(fitresult[6]) is not 3):
-        xvals = fitresult[7]
-        conf_int_high = [x+y for (x,y) in zip(fitresult[0], fitresult[6])]
-        conf_int_low = [x-y for (x,y) in zip(fitresult[0], fitresult[6])]
-
-        xvals_sorted, conf_int_high_sorted = zip(*sorted(zip(xvals, conf_int_high)))
-        xvals_sorted, conf_int_low_sorted = zip(*sorted(zip(xvals, conf_int_low)))
-    else:
-        xvals = fitresult[6][0]
-        #print("Warning: Confidence interval length does not match data length")
-        conf_int_high = [x+y for (x,y) in zip(fitresult[6][1], fitresult[6][2])]
-        conf_int_low = [x-y for (x,y) in zip(fitresult[6][1], fitresult[6][2])]
-
-        xvals_sorted, conf_int_high_sorted = zip(*sorted(zip(xvals, conf_int_high)))
-        xvals_sorted, conf_int_low_sorted = zip(*sorted(zip(xvals, conf_int_low)))
-
-    #ax.plot(xvals_sorted, conf_int_high_sorted)
-    #ax.plot(xvals_sorted, conf_int_low_sorted)
-    if(drawHist):
-        ax.fill_between(xvals_sorted, conf_int_high_sorted, conf_int_low_sorted,
-                       facecolor=color, interpolate=True,
-                       alpha = 0.2,
-                       label=labeli)
-    return( xvals_sorted, conf_int_high_sorted, conf_int_low_sorted )
-        
-        
-        
-def drawFitResult(ax, fitresult, scaleFactor=100, drawFormat="-", label="Default"):
-    #print(fitresult)
+def ComputeKawallBand(listOfErrors):
     '''
-        Draws a fit result object returned by fitVector function on 'ax' (axes or plot from matplotlib)
+        Computes the Kawall band according to aarons thesis equation 6.16: sigma^2_k = sigma^2_scan - sigma^2_initial
+        Inputs:
+            List of errors (list of floats): Fit errors for the parameter for which to compute the Kawall band. The first point is the reference.
+        Outputs:
+            kBand (list of floats) : list giving the allowed \pm 1 \sigma values of each point in the start time scan
     '''
-    if(scaleFactor > 1):
-        x0 = fitresult[7][0]
-        xn = fitresult[7][len(fitresult[7])-1]
-        xs = np.linspace(x0,xn,scaleFactor)
-        ys = [fitresult[4].Eval(xi) for xi in xs]
-    else:
-        xs = fitresult[7]
-        ys = fitresult[0]
-    
-    if(label == "Default"):
-        labelString = labelFit(fitresult[1][0], fitresult[1][1], None, fitresult[2]) 
-    else:
-        labelString = label
-    
-    ax.plot(xs,ys,drawFormat,label=labelString)
-    
+
+    kBand = []
+    initialErr = listOfErrors[0]
+
+    for i in range( len(listOfErrs) ):
+        thisErr = listOfErrors[i]
+        sigmai = math.sqrt( math.pow(thisErr, 2) - math.pow(initialErr, 2)  )
+        kBand.append(sigmai)
+
+    return kBand
+
+from python_fit import * #gets python fit utils
