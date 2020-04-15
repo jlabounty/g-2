@@ -127,6 +127,13 @@ class fitVector():
                         alpha = 0.2,
                         label=labeli)
         return( xvals_sorted, conf_int_high_sorted, conf_int_low_sorted )
+
+    def convertRootLabelsToPython(self, label):
+        '''
+            ROOT and Python parse LaTeX slightly differently for their legends. Lets convert between them.
+        '''
+        if("#" in label or "_" in label):
+            print(label)
         
     def labelFit(self, parNames=None, functionString=None, formatStr="7.3E", func=None):
         import ROOT as r
@@ -137,7 +144,8 @@ class fitVector():
         chiSquare = self.chiSq
 
         if(parNames is None):
-            parNames = ["p"+str(i) for i in range(len(pars))]
+            #parNames = ["p"+str(i) for i in range(len(pars))]
+            parNames = [str(self.f.GetParName(i)) for i in range(len(pars))]
         if(func is not None):
             x1 = r.Double()
             x2 = r.Double()
@@ -318,7 +326,7 @@ class fitVector():
             ax[1].set_title("FFT result")
             ax[1].plot([np.abs(x) for x in freq],np.abs(ding),'.:',label='FFT Result')
             #ax[1].set_xlim(0,50)
-            plt.xlabel("Frequency [???]")
+            plt.xlabel("Frequency [MHz]")
             #plt.xlim(0,6.7157787731503555 / 2)# *10.**6)
             plt.legend()
             plt.suptitle("FFT Of Fit Result", y=1.02, fontsize=18)

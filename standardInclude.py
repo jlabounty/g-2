@@ -1383,4 +1383,24 @@ def ComputeKawallBand(listOfErrors):
 
     return kBand
 
+
+def histToTH1(ding, title=""):
+    '''
+        Converts an input python hist into a TH1
+        Inputs:
+            ding - plt.hist() object
+            title - string
+        Outputs:
+            h - TH1D object
+    '''
+    nbins=len(ding[1])-1
+    bin1 = min(ding[1])
+    binN = max(ding[1])
+    
+    h = r.TH1D("h",title,nbins,bin1,binN)
+    for i, yi in enumerate(ding[0]):
+        h.SetBinContent(i+1, yi)
+        
+    return h
+
 from python_fit import * #gets python fit utils
