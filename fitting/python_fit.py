@@ -2,7 +2,7 @@
 
 class fitVector():
 
-    def __init__(self, x, y, function, xerr = None, yerr = None, fitoptions = "RQ", nFit = 2, function_python=None):
+    def __init__(self, x=None, y=None, function=None, xerr = None, yerr = None, fitoptions = "RQ", nFit = 2, input_file=None):
         '''
             Dumps a python vector of x and y points into a TGraph, then fits with the TF1 function and returns the fit result
             Input:
@@ -15,6 +15,13 @@ class fitVector():
                 nFit       - number of times to do fit. Iteration can sometimes produce better results.
                     
         '''
+
+        if(input_file is not None):
+            self.from_file(input_file)
+            return
+        
+        if(x is None or y is None or function is None):
+            raise ValueError("One or more required arguments (x,y,func) is not defined")
         
         import ROOT as r
         import numpy as np
@@ -116,6 +123,70 @@ class fitVector():
         self.pulls = pulls 
         self.residualsInRange = residualsInRange
         self.pullsInRange = pullsInRange
+
+    def from_file(self, filename):
+        print("Importing from:", filename)
+        import ROOT as r
+
+        f = r.TFile(filename)
+        f.ls()
+
+        t = f.Get("t")
+
+        keys = [x.GetName() for x in f.GetListOfKeys() if (x.GetName() is not "t")]
+        print(keys )
+
+        for key in keys:
+            ding = f.Get(key)
+            #ding.SetDirectory(0)
+            exec("self."+str(key)+" = ding")
+            #exec("self."+str(key)+".SetDirectory(0)")
+
+        keys = [x.GetName() for x in t.GetListOfBranches()]
+        extractedVecs = [None for i in keys]
+        for j, entry in enumerate(t): #should only be 1
+            #print(entry)
+            for i, key in enumerate(keys):
+                entries = entry.Draw(key,"","goff")
+                content = [entry.GetVal(0)[x] for x in range(entries)]
+                #print(content)
+                if(len(content) is 1):
+                    content = content[0]
+                try:
+                    content = list(content)
+                except:
+                    pass
+                #print(content)
+                extractedVecs[i] = content 
+            break
+        #print(extractedVecs)
+
+        #reform the _N entries into sublists
+        formattedVecs = []
+        formattedEntries = []
+        dicti = {}
+        for key in keys:
+            dicti[key.split("_")[0]] = []
+        print(dicti)
+        for (key, veci) in zip(keys,extractedVecs):
+            corekey = key.split("_")[0]
+            nentries = sum(corekey in s for s in keys)
+            if(nentries > 1 and len(key.split("_")) > 1):
+                print(key)
+                dicti[corekey].append(veci)
+            else:
+                formattedVecs.append(veci)
+                formattedEntries.append(key)
+        
+        for key in keys:
+            corekey = key.split("_")[0]
+            if len(dicti[corekey]) > 1:
+                exec("self."+str(corekey)+" = "+str(dicti[corekey]))
+
+        for(key, vec) in zip(formattedEntries, formattedVecs):
+            exec("self."+str(key)+" = "+str(vec))
+
+        f.Close()
 
     def __getitem__(self,index):
         '''
@@ -404,9 +475,116 @@ class fitVector():
 
         return (freq, ding)
     
+    def save(self, outfile_name):
+        print("Saving to:", outfile_name)
+        import inspect 
+        import ROOT as r
+
+        self.arrs = []
+        self.arrCounter = 0
+
+        toSave = []
+        attributes = inspect.getmembers(self, lambda a:not(inspect.isroutine(a)))
+        #print(attributes)
+        for x in attributes:
+            if ("__" not in x[0]):
+                print(x)
+                toSave.append(x)
+        
+        self.fout = r.TFile(outfile_name,"RECREATE")
+        self.fout.cd()
+
+        t = r.TTree("t","Variable Tree")
+
+        for key, item in toSave:
+            if(item is None):
+                #do nothing
+                continue
+
+            elif(isinstance(item, int) or isinstance(item, float)):
+                self.CreateBranchFloat( key, item, t )
+                #r.gROOT.cd()
+
+            elif( isinstance(item, list) ):
+                if( len(item) > 0 ):
+                    #loop and get type of the most nested element of list
+                    depth = self.depth(item)
+                    #print(depth)
+                    isFloatOrInt = "item"
+                    for i in range(depth):
+                        isFloatOrInt += "[0]"
+                    itemNested = eval(isFloatOrInt)
+                    #print(itemNested)
+                    #if most nested element is a int/float, then create a branch
+                    if(isinstance(itemNested, int) or isinstance(itemNested, float)):
+                        self.CreateBranchFloat( key, item, t )
+                    elif( isinstance(item[0], str) ):
+                        for i, itemi in enumerate(item):
+                            stri = r.TNamed(key+"_"+str(i),itemi)
+                            stri.Write()
+                    else:
+                        print("This type of list is not supported:", item)
+                #r.gROOT.cd()
+
+            elif( isinstance(item, str) ):
+                #strings
+                stri = r.TNamed(key,item)
+                stri.Write()
+
+            elif( "ROOT.TF1" in (str(type(item))) ):
+                f1 = item
+                f1.Write(key)
+
+            else:
+                print("Type not supported", type(item) )
+
+        t.Fill()
+
+        self.fout.cd()
+        self.fout.Write()
+        self.fout.Close()
+
+    def depth(self, l):
+        if isinstance(l, list):
+            return 1 + max(self.depth(item) for item in l)
+        else:
+            return 0
+        
+    def CreateBranchFloat( self, key, item, t ):
+        from array import array
+        length = 0
+        if(isinstance(item, list)):
+            length = len(item)
+            if(length == 0):
+                return
+            else:
+                #print(length, item)
+                if( isinstance(item[0], list) ):
+                    for i in range(len(item)):
+                        self.CreateBranchFloat( key+"_"+str(i), item[i], t )
+                    return
+            
+        ni = array( 'f', [ 0 for x in range(length+1) ] )
+        if(length > 0):
+            for i in range(length):
+                #print(ni, list(item)[i])
+                ni[i] = list(item)[i]
+        else:
+            ni[0] = item
+            
+        self.arrs.append( ni )
+        i = len(self.arrs) - 1
+        if(length == 0):
+            keystring = key+"/F"
+        else:
+            keystring = key+"["+str(length)+"]/F"
+        
+        #print(keystring, ni)
+        t.Branch(key, self.arrs[i], keystring)
+        #r.gROOT.cd()
     
     
-from standardInclude import *
+#from standardInclude import *
 
 def fitHistGaussian(hist, ax, draw = False, label=True):
     '''
@@ -414,7 +592,8 @@ def fitHistGaussian(hist, ax, draw = False, label=True):
     '''
     
     import ROOT as r
-    
+    from standardInclude import histToTH1, TH1ToNumpyArray
+
     xmin = min(hist[1])
     xmax = max(hist[1])
     fgaus = r.TF1("fgaus","gaus",xmin, xmax)
