@@ -25,7 +25,6 @@ def main():
     parser.add_argument('--lifetime', default=None)
     parser.add_argument("--python-args", default=None, nargs='+')
     parser.add_argument("--test", default=False, type=bool)
-    parser.add_argument("-N", default=None)
     parser.add_argument("--tar", default="/pnfs/GM2/scratch/users/labounty/python.tar.gz")
     parser.add_argument('--python-custom', default='/gm2/app/users/labounty/github/g-2/fitting/',help='The custom python files which will be tarred up and sent to the grid node along with the existing python tarball')
     
@@ -36,8 +35,6 @@ def main():
     jobstring += " --OS="+ding.OS 
     jobstring += ' --group='+ding.group
     jobstring += ' --memory='+ding.memory
-    if(ding.N is not None):
-        jobstring += ' -N '+ding.N
     if(ding.disk is not None):
     	jobstring += ' --disk='+ding.disk
     if(ding.lifetime is not None):
@@ -49,7 +46,7 @@ def main():
     	jobstring += ' --tar_file_name=dropbox://'+ding.tar
 
     python_lib_dir = "/pnfs/GM2/scratch/users/labounty/ding.tar.gz"
-    to_tar = "tar -hzcvf "+python_lib_dir+" "+ding.python_custom+"*{py,so}"
+    to_tar = "tar -hzcvf "+python_lib_dir+" "+ding.python_custom+"*py"
     print(to_tar)
     if(not ding.test):
         os.system("rm -f "+python_lib_dir)
@@ -99,7 +96,7 @@ def main():
     print(jobstring)
     if(not ding.test):
         print("Executing...")
-        os.system(jobstring+" | tee ./submission_output.log")
+    	os.system(jobstring+" | tee ./submission_output.log")
     with open("./submission.log","w") as file:
     	file.write(jobstring)
     if(not ding.test):

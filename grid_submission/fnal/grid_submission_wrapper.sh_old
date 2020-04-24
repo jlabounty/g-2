@@ -22,15 +22,12 @@ echo "Tar file"
 echo $tar
 ls -ltrh $tar
 
-cluster=$CLUSTER
-process=$PROCESS
-echo $cluster "/" $process
 
-export data=$CONDOR_DIR_A/
+data=$CONDOR_DIR_A/
 echo "Data dir:" $data
 ls -ltrh ${data}
 
-export input=$CONDOR_DIR_INPUT/
+input=$CONDOR_DIR_INPUT/
 echo "Input dir:" $input
 ls -ltrh ${input}
 ding=$(ls ${input}/* | grep 'tar.gz')  
@@ -38,10 +35,9 @@ tar -zxvf $ding
 ls -ltrh ${input}
 cp ./gm2/app/users/labounty/github/g-2/fitting/*py ${input}
 cp ./gm2/app/users/labounty/github/g-2/fitting/*py .
-cp ./gm2/app/users/labounty/github/g-2/fitting/*so .
 ls -ltrh ${input}
 
-echo "Hello grid!" | tee ${data}hello_file_${process}.txt
+echo "Hello grid!" | tee ${data}output_file.txt
 
 ls -ltrh .
 
@@ -49,7 +45,7 @@ echo ${data}${pythonArgs}
 
 pythonDir="./python/"
 set -x
-${pythonDir}install/bin/python ${input}${pythonFile} ${pythonArgs} ${process}
+${pythonDir}/install/bin/python ${input}${pythonFile} ${data}${pythonArgs}
 set +x
 
 ls -ltrh ${data}
