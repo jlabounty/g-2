@@ -5,7 +5,7 @@
 #S -V                                                   #inherit environment veriables
 #-S -m ea
 #-S M jjlab@uw.edu                                      #email completion messages here
-#$ -N QueueTest                                         #job name
+#$ -N gm2ringsim                                        #job name
 #$ -e /data/g2/users/labounty/logFiles/                 #output error messages to here
 #$ -o /data/g2/users/labounty/logFiles/                 #output stdout to here
 #$ -l scratch=25G
@@ -31,7 +31,7 @@ echo $datestring
 
 echo $scriptPath $script $infilepath $infile $outdir
 
-#return 1
+return 1
 
 #make sure the output directory exists
 mkdir -p $outdir
@@ -60,7 +60,7 @@ do
             echo "${infile} does not exist on this filesystem. copying now."
             rsync -vz --progress  ${infilepath}/${infile} $ROOTSTORAGE/
         fi
-		rsync -vz --progress  ${scriptPath}${script}  $TMPDIR/
+		rsync -vz --progress  ${scriptPath}/${script}  $TMPDIR/
 		rm -f ${queue_dir}${datestring}
 		break
 	fi
@@ -79,12 +79,10 @@ ls -ltrh
 
 #create a bash script to exececute in the singularity container
 
-FILE="${TMPDIR}/singularity_script.sh"
-
-text1
-text2 # This comment will be inside of the file.
-The keyword EOM can be any text, but it must start the line and be alone.
- EOM # This will be also inside of the file, see the space in front of EOM.
+#FILE="${TMPDIR}/singularity_script.sh"
+FILE="singularity_script.sh"
+logfile="gm2_output.log"
+cd ${TMPDIR}
 
 /bin/cat <<EOM >$FILE
 #!/bin/bash
@@ -103,7 +101,9 @@ pwd
 ls -ltrh
 
 #gm2 -c ${TMPDIR}/${script} -s ${ROOTSTORAGE}/${infile} ${gm2Args}
-gm2 -c ${TMPDIR}/${script} ${gm2Args}
+#gm2 -c ${TMPDIR}/${script} ${gm2Args}
+gm2 -c ${TMPDIR}/${script} ${gm2Args} | tee ${logfile}
+#gm2 -c ${script} ${gm2Args}
 
 pwd
 ls -ltrh
@@ -112,10 +112,12 @@ echo "All done with singularity."
 
 EOM
 
+ls -ltrh $FILE
+
 #now that we have that created, check that it exists
 if [[  -f $FILE ]]
 then
-    singularity exec -B ${ROOTSTORAGE}/sim/docker/cvmfs:/cvmfs -B ${TMPDIR}:${TMPDIR} -B ${ROOTSTORAGE}:${ROOTSTORAGE} $FILE
+    singularity exec -B ${ROOTSTORAGE}/sim/docker/cvmfs:/cvmfs -B ${TMPDIR}:${TMPDIR} -B ${ROOTSTORAGE}:${ROOTSTORAGE} ${ROOTSTORAGE}/sim/container/cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl6\:latest /bin/bash $FILE
 fi
 
 #copy the output file back to the correct directory
@@ -130,6 +132,8 @@ do
 		echo Processing!
 		touch ${queue_dir}${datestring}
 		rsync -vz --progress  $TMPDIR/*root ${outdir}/
+		rsync -vz --progress  $TMPDIR/*fcl ${outdir}/
+		rsync -vz --progress  $FILE ${outdir}/
 		rm -f ${queue_dir}${datestring}
 		break
 	fi
@@ -138,4 +142,4 @@ do
 done 
 
 echo "All done."
-send_to_slack("All done with gm2ringsim, check: ${outdir}")
+send_to_slack "All done with gm2ringsim, check: ${outdir}"
