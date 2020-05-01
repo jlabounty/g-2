@@ -43,7 +43,9 @@ def main():
     if(ding.lifetime is not None):
     	jobstring += ' --expected-lifetime='+ding.lifetime
 
-    if("pnfs" in ding.tar):
+    if(ding.tar == "None"):
+        print("Warning: Submitting with no tar file")
+    elif("pnfs" in ding.tar):
     	jobstring += ' --tar_file_name='+ding.tar
     else:
     	jobstring += ' --tar_file_name=dropbox://'+ding.tar
