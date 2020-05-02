@@ -22,10 +22,6 @@ int getSubrunNumber(TString & filename)
   return subrun; 
 }
 
-void extractNearline_init()
-{
-	std::cout<< "Preparing for dqc..." << std::endl;
-}
 
 void extractNearline(TDirectory *dir, ostream & ostr)
 {
@@ -208,6 +204,7 @@ void extractNearline(TDirectory *dir, ostream & ostr)
 
 void runall(char *dirName, char *sqlFilename, int modulo = -1, int offset = -1)
 {
+  std::cout << "Running... " << std::endl;
   ofstream sqlFile(sqlFilename, ofstream::out);
   void *dirp = gSystem->OpenDirectory(dirName);
   const char *entry;
@@ -231,7 +228,17 @@ void runall(char *dirName, char *sqlFilename, int modulo = -1, int offset = -1)
     } 
   }
   sqlFile.close();
-  exit(0);
+  //exit(0);
+}
+
+void runonce(char* fileName, char* sqlFilename)
+{
+	ofstream sqlFile(sqlFilename, ofstream::out); 
+	//TFile *file = new TFile(fileName); //will this work with xroot?
+	TFile *file = TFile::Open(fileName); //will this work with xroot?
+	extractNearline(file, sqlFile);  
+	delete file;
+	sqlFile.flush();  
 }
 
 void runDirTree(char *dirName, char *sqlFilename, int firstRun, int lastRun)
@@ -302,4 +309,14 @@ void runListingFile(char *listfileName, char *sqlFilename, int modulo = -1, int 
 
   }
   sqlFile.close();
+}
+
+
+void extractNearline_init(char* directory, char* outfile, int v2, int v3)
+{
+	std::cout<< "Preparing for dqc..." << std::endl;
+	//runall(directory,outfile,v2,v3);
+	runonce(directory,outfile);
+	std::cout << "All done! " <<std::endl;
+	exit(0);
 }
