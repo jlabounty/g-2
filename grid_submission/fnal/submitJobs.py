@@ -27,8 +27,12 @@ def main():
     parser.add_argument("--test", default=False, type=bool)
     parser.add_argument("-N", default=None)
     parser.add_argument("--tar", default="/pnfs/GM2/scratch/users/labounty/python.tar.gz")
+    parser.add_argument("--python-lib-dir", default="/pnfs/GM2/scratch/users/labounty/ding.tar.gz")
     parser.add_argument('--python-custom', default='/gm2/app/users/labounty/github/g-2/fitting/',help='The custom python files which will be tarred up and sent to the grid node along with the existing python tarball')
     
+    os.system("kx509")
+    os.system("voms-proxy-init -noregen -rfc -voms fermilab:/fermilab/gm2/Role=Analysis")
+
     ding = parser.parse_args(sys.argv[1:])
     #print(ding)
     #print(ding.foo)
@@ -50,10 +54,11 @@ def main():
     else:
     	jobstring += ' --tar_file_name=dropbox://'+ding.tar
 
-    python_lib_dir = "/pnfs/GM2/scratch/users/labounty/ding.tar.gz"
+    #python_lib_dir = "/pnfs/GM2/scratch/users/labounty/ding.tar.gz"
+    python_lib_dir = ding.python_lib_dir 
     to_tar = "tar -hzcvf "+python_lib_dir+" "+ding.python_custom+"*{py,so}"
     print(to_tar)
-    if(not ding.test):
+    if((not ding.test) and ("None" not in python_lib_dir)):
         os.system("rm -f "+python_lib_dir)
         os.system(to_tar)
 
@@ -77,7 +82,10 @@ def main():
             fileName = f.split("/")[len(f.split("/")) -1]
             jobstring += ' -f '+ding.d+"/"+fileName
 
-    if("pnfs" in python_lib_dir):
+
+    if("None" in python_lib_dir):
+    	jobstring += ' '
+    elif("pnfs" in python_lib_dir):
     	jobstring += ' -f '+python_lib_dir
     else:
     	jobstring += ' -f dropbox://'+python_lib_dir
