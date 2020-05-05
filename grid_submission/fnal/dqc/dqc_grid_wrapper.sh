@@ -58,9 +58,9 @@ cp ${input}* .
 outfile="${data}dqc_processing_${cluster}_${3}_${process}.sql"
 touch ${outfile}
 
-$application="root"
-$version="6.12"
-$host=`/bin/hostname`
+application="gm2"
+version="v9_41_00"
+host=`/bin/hostname`
 
 echo $application "/" $version 
 echo "Running on: " $host
@@ -90,7 +90,6 @@ if [[ "${pythonArgs}" == *"sam-dataset-True"* ]]; then
 			then
 				echo "Success!"
 				ifdh updateFileStatus $cpurl  $consumer_id $fname consumed
-				ifdh addOutput some_outputfile
 				cat intermediate.sql >> ${outfile}
 				echo " " >> ${outfile}
 			else
@@ -100,8 +99,8 @@ if [[ "${pythonArgs}" == *"sam-dataset-True"* ]]; then
 			fi
 		fi
 		rm -f $fname
-		#furi=`ifdh getNextFile $cpurl $consumer_id`
-		furi=""
+		furi=`ifdh getNextFile $cpurl $consumer_id`
+		#furi=""
 	done
 
 	ifdh setStatus $cpurl $consumer_id $status
