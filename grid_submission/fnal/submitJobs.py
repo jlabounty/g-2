@@ -5,6 +5,8 @@ import argparse
 import datetime
 import time
 
+import ifdh
+
 
 def main():
     jobstring = "jobsub_submit "
@@ -12,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process grid submission options')
     parser.add_argument('--foo', help='foo help', default='henlo', type=str)
     parser.add_argument('--OS', help='foo help', default='SL6', type=str)
-    parser.add_argument('--group', default='fermilab')
+    parser.add_argument('--group', default='fermilab', type=str)
     parser.add_argument('--condor-req', default=['\'(TARGET.HAS_CVMFS_gm2_opensciencegrid_org==true)\'', 
                                                  '\'(TARGET.HAS_SINGULARITY=?=true||TARGET.IFOS_Installed=?="SL6")\' '],
                                                   nargs='+')
@@ -23,6 +25,8 @@ def main():
     parser.add_argument('--memory', default="2GB")
     parser.add_argument('--disk', default=None)
     parser.add_argument('--lifetime', default=None)
+    parser.add_argument('--dataset', default=None)
+    parser.add_argument('--user', default="labounty", type=str)
     parser.add_argument("--python-args", default=None, nargs='+')
     parser.add_argument("--test", default=False, type=bool)
     parser.add_argument("-N", default=None)
@@ -37,8 +41,33 @@ def main():
     #print(ding)
     #print(ding.foo)
 
+    # https://cdcvs.fnal.gov/redmine/projects/ifdhc/repository/revisions/master/entry/demo.py
+    if(ding.dataset is not None):
+        print("Using SAM dataset:", ding.dataset)
+        if not os.environ.has_key("EXPERIMENT"):
+            os.environ["EXPERIMENT"] = ding.group
+        #establish the sam process
+        i = ifdh.ifdh()
+        projname=time.strftime("DQC_Labounty_test_%Y%m%d%H_%%d")%os.getpid()
+        dataset=ding.dataset
+
+        cpurl=i.startProject(str(projname), ding.group, str(dataset), ding.user, ding.group)
+        time.sleep(2)
+        cpurl=i.findProject(projname,ding.group)
+
+#        consumer_id=i.establishProcess( cpurl, "demo","1", "bel-kwinith.fnal.gov","mengel" )
+        print "got cpurl, consumer_id: ", cpurl 
+
+        jobstring += " -e SAM_PROJECT_NAME="+projname+" -e GRID_USER="+ding.user+" -e EXPERIMENT="+ding.group
+        ding.python_args.append(" sam-dataset-True")
+
+        os.system('echo "ifdh endProject '+cpurl+' ; \n ifdh cleanup" > endscript.sh')
+
+
     jobstring += " --OS="+ding.OS 
     jobstring += ' --group='+ding.group
+    if("B" not in ding.memory):
+        ding.memory = ding.memory+"GB"
     jobstring += ' --memory='+ding.memory
     if(ding.N is not None):
         jobstring += ' -N '+ding.N
@@ -98,6 +127,7 @@ def main():
 
     if(not ding.test):
     	os.system("cp "+ding.submission_file+" "+ding.d)
+    	os.system("cp endscript.sh "+ding.d)
     new_sub_file = ding.submission_file.split("/")[len(ding.submission_file.split("/")) -1] 
     jobstring += " file://"+ding.d+"/"+new_sub_file
     for f in ding.f:

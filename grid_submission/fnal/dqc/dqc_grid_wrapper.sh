@@ -55,48 +55,107 @@ set -x
 cp ${input}* .
 #cd ${input}
 
-directory="/pnfs/GM2/scratch/users/gm2pro/DQCAna/5112B/ProductionCRecovery/2020-04-30-20-20-17/data/"
-filelist=$( ifdh ll ${directory} )
-echo "${filelist}"
-
 outfile="${data}dqc_processing_${cluster}_${3}_${process}.sql"
 touch ${outfile}
 
-njobs=${3}
-thisjob=${process}
+$application="root"
+$version="6.12"
+$host=`/bin/hostname`
 
-modulo=$njobs  
-counter=0
+echo $application "/" $version 
+echo "Running on: " $host
 
+#sam version
+if [[ "${pythonArgs}" == *"sam-dataset-True"* ]]; then
 
-for file in $filelist;
-do
-	if [[ "${file}" == *"root"* ]]; then
-		thisfilenum=$( expr $counter % $modulo )  
-		if [[ "$thisfilenum" == "$thisjob" ]]; then 
-			echo $counter / $thisfilenum
-			echo ${directory}$file
-			xrdfilei=$( echo `bash ${input}pnfsToXRootD ${directory}${file}` |tr '\r' ' ' ) 
-			echo "${xrdfilei}"
-			xrdfile=`echo "x"${xrdfilei}` #change root to xroot
-			echo "${xrdfile}"
-			echo "|" `echo ${xrdfile}` ";"
+	echo "Using SAM Dataset"
+	cpurl=`ifdh findProject $SAM_PROJECT_NAME ''`
+	consumer_id=`ifdh establishProcess $cpurl $application $version $host $GRID_USER "" "" "" `
+	echo "Established project with URL/ID: " $cpurl "/" $consumer_id
 
-			#xrootd version
-			root -b -l extractNearline_init.C\(\"${xrdfile}\",\"intermediate.sql\",1,2\)
+	furi=`ifdh getNextFile $cpurl $consumer_id`
 
-			#ifdh cp version
-			#ifdh cp -D ${directory}${file} .
-			#root -b -l extractNearline_init.C\(\"./${file}\",\"intermediate.sql\",1,2\)
-			#rm -f ./${file}
+	status="ok" 
 
-			cat intermediate.sql >> ${outfile}
-			echo " " >> ${outfile}
+	while [ "$furi"  != "" ]
+	do
+		fname=`ifdh fetchInput $furi | tail -1 `
+		echo "Processing file: " $fname
+		if [ "$fname" != "" ]
+		then
+			ifdh updateFileStatus $cpurl  $consumer_id $fname transferred
+			root -b -l extractNearline_init.C\(\"${fname}\",\"intermediate.sql\",1,2\)
+			exit_status=$?
+			if [[ "$exit_status" == "0" ]];
+			then
+				echo "Success!"
+				ifdh updateFileStatus $cpurl  $consumer_id $fname consumed
+				ifdh addOutput some_outputfile
+				cat intermediate.sql >> ${outfile}
+				echo " " >> ${outfile}
+			else
+				echo "Uh oh, something went wrong"
+				ifdh updateFileStatus $cpurl  $consumer_id $fname skipped
+				status="bad" 
+			fi
 		fi
-		counter=$(expr ${counter} + 1 ) 
-	fi
+		rm -f $fname
+		#furi=`ifdh getNextFile $cpurl $consumer_id`
+		furi=""
+	done
 
-done
+	ifdh setStatus $cpurl $consumer_id $status
+
+else #original non-sam based version
+	#directory="/pnfs/GM2/scratch/users/gm2pro/DQCAna/5112B/ProductionCRecovery/2020-04-30-20-20-17/data/"
+	directory=${4}
+	filelist=$( ifdh ll ${directory} )
+	echo "${filelist}"
+
+	outfile="${data}dqc_processing_${cluster}_${3}_${process}.sql"
+	touch ${outfile}
+
+	njobs=${3}
+	thisjob=${process}
+
+	modulo=$njobs  
+	counter=0
+
+	return -1
+
+	for file in $filelist;
+	do
+		if [[ "${file}" == *"root"* ]]; then
+			thisfilenum=$( expr $counter % $modulo )  
+			if [[ "$thisfilenum" == "$thisjob" ]]; then 
+				echo $counter / $thisfilenum
+				echo ${directory}$file
+				if [[ "${file}" == *"/pnfs/"* ]]; then
+					xrdfilei=$( echo `bash ${input}pnfsToXRootD ${file}` |tr '\r' ' ' ) 
+				else
+					xrdfilei=$( echo `bash ${input}pnfsToXRootD ${directory}${file}` |tr '\r' ' ' ) 
+				fi
+				echo "${xrdfilei}"
+				xrdfile=`echo "x"${xrdfilei}` #change root to xroot
+				echo "${xrdfile}"
+				echo "|" `echo ${xrdfile}` ";"
+
+				#xrootd version
+				root -b -l extractNearline_init.C\(\"${xrdfile}\",\"intermediate.sql\",1,2\)
+
+				#ifdh cp version
+				#ifdh cp -D ${directory}${file} .
+				#root -b -l extractNearline_init.C\(\"./${file}\",\"intermediate.sql\",1,2\)
+				#rm -f ./${file}
+
+				cat intermediate.sql >> ${outfile}
+				echo " " >> ${outfile}
+			fi
+			counter=$(expr ${counter} + 1 ) 
+		fi
+
+	done
+fi
 
 rm -f intermediate.sql
 
