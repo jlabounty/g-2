@@ -1,12 +1,8 @@
-spec = (
-    ("verbosity",int32),
-    ("deltat", float64),
-    #('hpy', typeof(ding))
-)
-
-
 from functools import partial
-from numba import prange
+from numba import prange, jit, njit
+from numba import int32, float64    # import the types
+
+from py_th2 import *
 
 
 class PythonPileup:
@@ -19,13 +15,14 @@ class PythonPileup:
             Outputs:
                 Double/Triple pileup spectrum
     '''
-    def __init__(self, h, name, iteration = 0, deltat = 2, verbosity = -1, tFitLow = 30):
+    def __init__(self, h=None, name=None, iteration = 0, deltat = 2, verbosity = -1, tFitLow = 30):
         
-        self.verbosity = verbosity
-        #self.h = h.Clone("N_initial_"+str(iteration)+"_"+name)
-        self.hpy = pyTH2(h)
-        self.deltat = deltat
-        #self.image, self.hpy = TH2ToNumpyArray(h)
+        if(h is not None):
+            self.verbosity = verbosity
+            self.hpy = pyTH2(h)
+            self.deltat = deltat
+        else:
+            print("Initializing empty function...")
     
     def __defaults__(self):
         return [None]
@@ -36,7 +33,6 @@ class PythonPileup:
     @staticmethod
     @njit(parallel=True)
     def rhoDoublePulse( E, t, hpy ):
-        #timeBin = self.h.GetXaxis().FindBin( t )
         timeBin = hpy.findbin( t ) 
 
         h2 = hpy.contents[:,timeBin:timeBin+1]
@@ -69,19 +65,19 @@ class PythonPileup:
         nBinsX = int(self.rhoDouble.binsx -2)
         nBinsY = int(self.rhoDouble.binsy -2)
         
-        self.rhoDouble.contents_overflow = self._computeRhoDouble(nBinsX, nBinsY, 
-                                                                  self.hpy, self.rhoDoublePulse, 
-                                                                  self.rhoDouble.contents_overflow )
-        
+        self._computeRhoDouble(nBinsX, nBinsY, 
+                                self.hpy, self.rhoDoublePulse, 
+                                self.rhoDouble.contents_overflow )
+
     @staticmethod
-    @njit(parallel=True)
+    @njit#(parallel=True)
     def _computeRhoDouble(nBinsX, nBinsY, hpy, rhoDoublePulse, rhoDouble ):
 
         print("Computing rho_double histogram")
-        for binx in prange(int(nBinsX)):
+        for binx in range(int(nBinsX)):
             #print("    ", binx,"/",nBinsX+1)
-            for biny in prange(int(nBinsY)):
-                #print(biny)
+            for biny in range(int(nBinsY)):
+                #print("    ", binx, biny)
                 #Ei = self.rhoDouble.GetYaxis().GetBinCenter(biny)
                 #ti = self.rhoDouble.GetXaxis().GetBinCenter(binx)
                 Ei = float(hpy.getbincenter(biny, 1))
@@ -91,9 +87,7 @@ class PythonPileup:
                 #print(Ei, ti, rhoi)
                 rhoDouble[biny+1][binx+1] = rhoi
         print("All done")
-        return rhoDouble
-        
-        
+        #return rhoDouble
         
         
     ''' and now to calculate the double pileup bin by bin '''
@@ -118,15 +112,15 @@ class PythonPileup:
         nBinsX = self.doublePileup.binsx -2
         nBinsY = self.doublePileup.binsy -2
         
-        self.doublePileup.contents_overflow =  self._ComputeDoubleCorrection(self.hpy.contents,
-                                                                             self.rhoDouble.contents, nBinsX, nBinsY, self.deltat
-                                                                            # self.doublePileup.contents_overflow 
-                                                                             )
+        self._ComputeDoubleCorrection(self.hpy.contents,
+                                        self.rhoDouble.contents, nBinsX, nBinsY, self.deltat,
+                                        self.doublePileup.contents_overflow 
+                                        )
         
     @staticmethod
-    @njit(parallel=True)
-    def _ComputeDoubleCorrection(h_cont, rhoDouble_cont, nBinsX, nBinsY, deltat ):
-        output = np.zeros( (h_cont.shape[0] +2, h_cont.shape[1] + 2) , dtype=np.float64)
+    @njit#(parallel=True)
+    def _ComputeDoubleCorrection(h_cont, rhoDouble_cont, nBinsX, nBinsY, deltat, output ):
+        #output = np.zeros( (h_cont.shape[0] +2, h_cont.shape[1] + 2) , dtype=np.float64)
         print("Computing double pileup correction")
         for binx in prange(int(nBinsX)):
             for biny in prange(int(nBinsY)):
@@ -135,35 +129,32 @@ class PythonPileup:
                 rhoi = deltat * ( rhoDouble_cont[biny][binx] - 2*h_cont[biny][binx]*integralN )
                 output[biny][binx] = rhoi
                 
-        return output
+        #return output
                 
         
     @staticmethod
-    @njit(parallel=True)
-    def rhoTriplePileup(E, t, hpy, rhoDouble, deltat):
-        timeBinN = hpy.findbin(t, 0) 
+    @njit#(parallel=True)
+    def rhoTriplePileup(E, t, timeBinN, hpy, rhoDouble, deltat):
+        #timeBinN = hpy.findbin(t, 0) 
         energySliceN = hpy.contents[:,timeBinN:timeBinN+1]
-        if np.sum(energySliceN) < 10**(-10):
-            return 0.        
-        timeBinRho = timeBinN
+        #if np.sum(energySliceN) < 10**(-10):
+        #    return 0.        
         energySliceRho = rhoDouble.contents[:,timeBinN:timeBinN+1]
         
-
-        
         int1s = np.zeros(int(len(energySliceRho)),dtype=float64)
-        if(len(energySliceRho) > 0.1):
-            for bin1 in prange( int(len(energySliceRho)) ):
-                Ed = float(hpy.centers(1)[ bin1 ])
-                if( Ed > E ):
-                    #print(Ed, E)
-                    int1s[bin1] = 0.
-                else:
-                    #print(bin1, E, Ed, energySliceRho, energySliceN)
-                    rho1 = energySliceN[ hpy.findbin( E - Ed, 1 ) ][0]
-                    rho2 = energySliceRho[ hpy.findbin(Ed, 1)  ][0]
-                    int1s[bin1] = rho1*rho2
-                    #print(rho1,rho2)
-                #print(int1)
+        #if(len(energySliceRho) > 0.1):
+        for bin1 in prange( int(len(energySliceRho)) ):
+            Ed = float(hpy.centers(1)[ bin1 ])
+            if( Ed > E ):
+                #print(Ed, E)
+                int1s[bin1] = 0.
+            else:
+                #print(bin1, E, Ed, energySliceRho, energySliceN)
+                rho1 = energySliceN[ hpy.findbin( E - Ed, 1 ) ][0]
+                rho2 = energySliceRho[ hpy.findbin(Ed, 1)  ][0]
+                int1s[bin1] = rho1*rho2
+                #print(rho1,rho2)
+            #print(int1)
         
         int1 = np.sum(int1s)
         int2 = np.sum(energySliceN)
@@ -172,9 +163,9 @@ class PythonPileup:
         rhoDoubleEt = rhoDouble.contents[ rhoDouble.findbin(E, 1)  ][timeBinN]
         rhoEt = hpy.contents[ rhoDouble.findbin(E, 1)  ][timeBinN]
         
-        if(t > 670):
-            print(E, t, timeBinN, int1, int2, int3, rhoDoubleEt, rhoEt)
-            print(energySliceN)
+        #if(t > 670):
+        #    print(E, t, timeBinN, int1, int2, int3, rhoDoubleEt, rhoEt)
+        #    print(energySliceN)
         
         return ((deltat)**2) * ( int1 - 3*rhoDoubleEt*int2 + 3*rhoEt*int3 )
 
@@ -183,32 +174,34 @@ class PythonPileup:
         self.triplePileup = pyTH2(self.hpy)
         self.triplePileup.clear_contents()
         
-        nBinsX = self.triplePileup.binsx -2
-        nBinsY = self.triplePileup.binsy -2
+        nBinsX = int(self.triplePileup.binsx) -2
+        nBinsY = int(self.triplePileup.binsy) -2
         
-        self.triplePileup.contents_overflow = self._ComputeTripleCorrection(nBinsX, nBinsY, self.hpy, 
-                                                                            self.doublePileup, self.deltat, 
-                                                                            self.rhoTriplePileup )
+        self._ComputeTripleCorrection(nBinsX, nBinsY, self.hpy, 
+                                        self.doublePileup, self.deltat, 
+                                        self.rhoTriplePileup,
+                                        self.triplePileup.contents_overflow  )
     
     @staticmethod
-    @njit(parallel=True)
+    @njit#(parallel=True)
     def _ComputeTripleCorrection(nBinsX, nBinsY, hpy, doublePileup, deltat, 
-                                 rhoTriplePileup):
+                                 rhoTriplePileup, output):
 
         print("Starting triple correction")
-        output = np.zeros( (hpy.contents_overflow.shape[0], hpy.contents_overflow.shape[1]) , dtype=np.float64)
-        for binx in prange(nBinsX):
-            for biny in prange(nBinsY):
+        #output = np.zeros( (hpy.contents_overflow.shape[0], hpy.contents_overflow.shape[1]) , dtype=np.float64)
+        #output_temp_vec = [np.zeros(( hpy.contents_overflow.shape[0], 1)) for i in range(nBinsX)]
+
+        for binx in range(int(nBinsX)):
+            #output_i = np.zeros(( hpy.contents_overflow.shape[0], 1), dtype=np.float64)
+            #print(binx)
+            for biny in range(int(nBinsY)):
                 #ti, Ei = self.triplePileup.centers_overflow[biny][binx]
                 Ei = float(hpy.getbincenter(biny, 1))
                 ti = float(hpy.getbincenter(binx, 0))
                 
-                #print(binx, biny, Ei, ti)
-                rhoi = rhoTriplePileup(Ei, ti, hpy, doublePileup, deltat)
-                #print(rhoi)
+                rhoi = rhoTriplePileup(Ei, ti, binx, hpy, doublePileup, deltat)
                 output[biny+1][binx+1] = rhoi
-                
-        return output
+
                 
     def fitPileup(self):
         return -1
