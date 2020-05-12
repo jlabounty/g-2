@@ -5,7 +5,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-basepath="/data/g2/users/labounty/gm2ringsim/"
+'''basepath="/data/g2/users/labounty/gm2ringsim/"
 
 paths = [
 	1589041125,
@@ -16,8 +16,10 @@ paths = [
 	1589041114,
 	1589041112,
 	1589041109
-]
+]'''
 
+basepath="/home/labounty/sim/100points/"
+files = os.listdir(basepath)
 
 tempvec = []
 efficiencies = []
@@ -39,12 +41,12 @@ drifttimehist.SetDirectory(0)
 
 ypos_vs_corner = r.TH3I("yposvscorner", "y-Position of Calo Hit vs. Corner of Collimator; y_calo [mm]; corner num; calo entry num",
                         100,-100,100,
-                        20,0,20,
+                        100,0,100,
                         20,0,20)
 
 rpos_vs_corner = r.TH3I("rposvscorner", "R-Position of Calo Hit vs. Corner of Collimator; R_calo [mm]; corner num; calo entry num",
                         400, 6800, 7200,
-                        20,0,20,
+                        100,0,100,
                         20,0,20)
 
 deltat = r.TH2I("deltat", "Time difference of first and second hit; delta t [ns]; calo num",
@@ -54,23 +56,28 @@ deltat = r.TH2I("deltat", "Time difference of first and second hit; delta t [ns]
 
 histsToSave = [hithist, nHits_vs_FirstCalo, drifttimehist, ypos_vs_corner, deltat, rpos_vs_corner]
 
-doTree = False
+doTree = True
 if(doTree):
-    for k, file in enumerate(paths):
+    #for k, file in enumerate(paths):
+    for k, file in enumerate(files):
         print("Starting files in:", basepath+str(file))
+        if(".root" not in file):
+            print("Skipping...")
+            continue
 
-        #f = r.TFile(file)
-        #t = f.Get("trajectoryAnalyzer/t")
+        f = r.TFile(basepath+file)
+        t = f.Get("trajectoryAnalyzer/t")
 
-        t = r.TChain("trajectoryAnalyzer/t")
-        t.Add(basepath+str(file)+"/*root")
+        #t = r.TChain("trajectoryAnalyzer/t")
+        #t.Add(basepath+str(file)+"/*root")
         
         
-        #name = file.split("data/")[1].split('.root')[0] 
+        name = file.split('.root')[0] 
 
-        allfiles = os.listdir(basepath+str(file))
+        #allfiles = os.listdir(basepath+str(file))
         #print(allfiles)
 
+        '''
         for ding in allfiles:
             if("root" in ding):
                 name = ding.split("col")[1].split('.root')[0] 
@@ -86,6 +93,11 @@ if(doTree):
         if(collimator == 8):
             corner_num += 5
         print(collimator, corner)
+        '''
+
+        collimator = int(name.split("_col")[1].split("_")[0])
+        corner_num = int(name.split("_")[3].split(".root")[0])
+        corner = [None, None]
         
         counter = 0
         
@@ -128,10 +140,10 @@ if(doTree):
                                         'caloY', 'goodtriples', 'efficiency', 'drifttime', 'corner_num', 'ncaloentries'])
     df.head()
 
-    df.to_csv("./python_output_may10.csv")
+    df.to_csv("./python_output_may12.csv")
 
     
-    outfile = "./histograms_collimator.root"
+    outfile = "./histograms_collimator_may12.root"
     print("Writing histograms to", outfile)
     fout = r.TFile(outfile,"recreate")
     for h in histsToSave:
@@ -141,7 +153,7 @@ if(doTree):
 
 else:
     print("Reading histogram from file")
-    df_full = pandas.read_csv("./python_output_may10.csv")
+    df_full = pandas.read_csv("./python_output_may12.csv")
     df = df_full.sample(10000)
 
 
