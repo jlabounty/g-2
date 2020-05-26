@@ -1404,3 +1404,30 @@ def histToTH1(ding, title=""):
     return h
 
 from python_fit import * #gets python fit utils
+
+def getWidths(h, scale=1, offset=0):
+    '''
+        Takes a TH2 of positions vs. time and returns a vector of time and standard deviations
+        Input:  h      - TH2
+                scale  - what to multiply the means by (after applying offset)
+                offset - any offset to the mean
+        Returns:
+                dicti  - dictionary of parameters, labelled.
+    '''
+    means = []
+    widths = []
+    times = []
+    meanErrs = []
+    widthErrs = []
+    for bini in range(1,h.GetNbinsX()+1):
+        hi = h.ProjectionY("", bini, bini)
+        time = h.GetXaxis().GetBinCenter(bini)
+        times.append(time)
+        means.append((hi.GetMean(1)-offset) * scale)
+        widths.append(hi.GetStdDev(1)*scale)
+        meanErrs.append(hi.GetMean(11)*scale)
+        widthErrs.append(hi.GetStdDev(11)*scale)
+
+    dicti = {'times':times, 'widths':widths, 'widthErrs':widthErrs, 'means':means, 'meanErrs':meanErrs}
+    #return(times, widths, widthErrs, means, meanErrs) 
+    return dicti
