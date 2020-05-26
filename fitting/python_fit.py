@@ -26,6 +26,7 @@ class fitVector():
         import ROOT as r
         import numpy as np
         import time
+        import ctypes 
 
         x = list(x)
         y = list(y)
@@ -50,16 +51,18 @@ class fitVector():
             fitresult = gri.Fit(fnew, fitoptions+"S")
             
         cov = fitresult.GetCovarianceMatrix()
-        #conf_int = r.Double()
+        #conf_int = ctypes.c_double
         if (len(x) == len(fitresult.GetConfidenceIntervals(0.95))):
             conf_int = [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
             self.xmin = min(x)
             self.xmax = max(x)
         else:
-            x1 = r.Double()
-            x2 = r.Double()
-
+            x1 = ctypes.c_double()
+            x2 = ctypes.c_double()
             fnew.GetRange(x1,x2)
+            x1 = x1.value
+            x2 = x2.value
+
             self.xmin = x1
             self.xmax = x2
             #print(x1,x2)
@@ -198,6 +201,9 @@ class fitVector():
                     self.x, self.residuals, self.pulls)
         return self.itemList[index]
 
+    def parNames(self):
+        return [self.convertRootLabelsToPython(str(self.f.GetParName(i))) for i in range(len(self.pars))]
+
     def drawConfidenceIntervals( self, ax, color='blue',labeli=None, drawHist=True):
 
         if(len(self.confidenceIntervals) is not 3):
@@ -243,6 +249,7 @@ class fitVector():
     def labelFit(self, parNames=None, functionString=None, formatStr="7.3E", func=None):
         import ROOT as r
         import textwrap
+        import ctypes 
 
         pars = self.pars
         parErrs = self.parErrs
@@ -252,9 +259,11 @@ class fitVector():
             #parNames = ["p"+str(i) for i in range(len(pars))]
             parNames = [self.convertRootLabelsToPython(str(self.f.GetParName(i))) for i in range(len(pars))]
         if(func is not None):
-            x1 = r.Double()
-            x2 = r.Double()
+            x1 = ctypes.c_double()
+            x2 = ctypes.c_double()
             func.GetRange(x1, x2)
+            x1 = x1.value 
+            x2 = x2.value 
             parstring = "Fit Result ["+str(round(x1,2))+" - "+str(round(x2,2))+"]"+"\n"
         else:
             parstring = "Fit Result"+"\n"
@@ -279,7 +288,7 @@ class fitVector():
         return parstring
 
     def draw(self,  title = "Fit Result", yrange=[None, None], xrange=None, data_title = "Data", 
-                    resid_title = "Fit Pulls", do_pulls=True, fit_hist=True):
+                    resid_title = "Fit Pulls", do_pulls=True, fit_hist=True, fmti=".-"):
         '''
             Creates a figure in matplotlib and draws the fitresult / residuals on it
         '''
@@ -296,7 +305,7 @@ class fitVector():
 
         axs = [ax1, ax2, ax3]
         ax = axs[0]
-        ax.errorbar(self.x, self.y ,yerr=self.yerr, fmt=".-", label="Data", ecolor='xkcd:grey', zorder=35)
+        ax.errorbar(self.x, self.y ,yerr=self.yerr, fmt=fmti, label="Data", ecolor='xkcd:grey', zorder=35)
         
         self.drawFitResult(ax, scaleFactor=int(len(self.x)*10))
         self.drawConfidenceIntervals(ax,"blue", "95% Confidence Level")
@@ -317,10 +326,10 @@ class fitVector():
         ax = axs[1]
         if(do_pulls):
             ax.set_title("Fit Pulls")
-            self.plotResiduals(ax,1,".:","All Residuals",1)
+            self.plotResiduals(ax,1,fmti,"All Residuals",1)
         else:
             ax.set_title("Fit Residuals")
-            self.plotResiduals(ax,0,".:","All Residuals",1)
+            self.plotResiduals(ax,0,fmti,"All Residuals",1)
         ax.set_ylabel(resid_title)
         ax.grid()
         if(yrange[1] is None):
@@ -412,6 +421,15 @@ class fitVector():
         #print(resid_to_plot)
         ding = ax.plot(x,resid_to_plot,fmt,label=labeli)
         return ding
+
+    def plotRunningAverage(self, averages=[1,10,100], showplot=True, fmti="."):
+        fig,ax = plt.subplots(figsize=(15,5))
+        for average in averages:
+            fitresult.plotResiduals(ax, 1, fmti, str(average), average)
+        plt.grid()
+        plt.title("Running Average of Residuals")
+        plt.legend()
+        return (fig,ax)
 
     def fft(self, xrange=None, option=0, time_conversion_factor = 10**(-6), drawHist = True, logy=True):
         '''
@@ -616,4 +634,43 @@ def fitHistGaussian(hist, ax, draw = False, label=True):
         
     return fiti
     
+def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = True):
+    '''
+        Utility to compare overtop two members of the fitVector class
+        Inputs:
+            fitdict - dictionary of name:fit
+            fig,ax (optional) - axes to draw the fit on
+            fmt - format string
+            drawFits - bool, whether or not to draw the fit results
+        Returns:
+            fig,ax
+    '''
+    import matplotlib.pyplot as plt 
+
+    if(fig is None):
+        fig,ax = plt.subplots(figsize=(15,5))
+    plt.sca(ax)
     
+    colors =     ['blue', 'xkcd:orange', 'xkcd:forest green']
+    datacolors = ['xkcd:lightblue', 'xkcd:light orange', 'xkcd:light green']
+    counter = 0
+    for name in fitdict:
+        fit = fitdict[name]
+        #ax.plot(fit.x, fit.y, fmti, color=datacolors[counter],label="Data: "+str(name))
+        if(drawData):
+            ax.errorbar(fit.x, fit.y, fmt=fmti, yerr=fit.yerr, 
+                        ecolor='xkcd:grey', color=datacolors[counter],
+                        label="Data: "+str(name) )
+        if(drawFits):
+            fit.drawFitResult(ax,color=colors[counter], scaleFactor=1000)
+        counter+=1
+        
+    plt.title("Comparison of Fits")
+    #plt.legend(ncol=counter)
+    plt.grid()
+    return (fig,ax)
+
+def fitHist(hist):
+    '''
+        Takes as input a root histogram and 
+    '''
