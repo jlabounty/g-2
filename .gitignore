@@ -24,6 +24,10 @@ nearline/run2templates/*
 data/
 *txt
 beaglebones/beagle-code
+docker/sim/build_slf6.x86_64/*
+docker/sim/localProducts_gm2_v9_44_00_prof/*
+docker/sim/srcs/*
+database/*/*fcl
 
 # Compiled source #
 ###################
