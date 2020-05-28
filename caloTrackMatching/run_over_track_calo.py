@@ -11,9 +11,9 @@ def main():
     funcdict = {'trackCalo':trackcalo, 'clusters':clusters, 'tracks':tracks, 'trackAndTrackCalo':trackCaloSam}
 
     paths = [
-        './input/',                 #run2c trees
-        './input_endgame/',         #endgame trees for tracks only
-        #'./input_endgame_sam/',    #endgame trees for clusters + calo-track matching
+        #'./input/',                 #run2c trees
+        #'./input_endgame/',         #endgame trees for tracks only
+        './input_endgame_sam/',    #endgame trees for clusters + calo-track matching
         #'./data/',                 #test directory for local area
          ]
     paths = ["/pnfs/GM2/scratch/users/labounty/caloTrackMatching/"+x for x in paths]
@@ -150,12 +150,12 @@ def trackcalo(name, f, file):
     h_caloCaloPos = gethist("caloCaloPos", 
                         "Calo Face Position from Clusters vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
-    t.Draw("station:(clusterY-3.)*25:clusterTime/1000.>>caloCaloPos",cutstring,"goff")
+    t.Draw("station:(clusterY):clusterTime/1000.>>caloCaloPos",cutstring,"goff")
 
     h_caloCaloPosRand = gethist("caloCaloPosRand", 
                         "Calo Face Position from Clusters vs. Rand Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
-    t.Draw("station:(clusterY-3.)*25:testfunc(clusterTime)/1000.>>caloCaloPosRand",cutstring,"goff")
+    t.Draw("station:(clusterY):testfunc(clusterTime)/1000.>>caloCaloPosRand",cutstring,"goff")
 
     h_trackerCaloPos_noRadialField = gethist("trackerCaloPos_noRadialField", 
                         "Tracker Calo Face Position [Straight Line Extrapolation] vs. Time; Time [#mu s]; y [mm]; Station Number",
@@ -213,13 +213,13 @@ def trackCaloSam(name, f, file):
     h_caloCaloPos = gethist("caloCaloPos", 
                         "Calo Face Position from Clusters vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
-    t.Draw("station:(clusterY-3.)*25:clusterTime/1000.>>caloCaloPos",cutstring,"goff")
+    t.Draw("station:(clusterY):clusterTime/1000.>>caloCaloPos",cutstring,"goff")
 
     
     h_caloCaloPosRand = gethist("caloCaloPosRand", 
                         "Calo Face Position from Clusters vs. Rand Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
-    t.Draw("station:(clusterY-3.)*25:testfunc(clusterTime)/1000.>>caloCaloPosRand",cutstring,"goff")
+    t.Draw("station:(clusterY):testfunc(clusterTime)/1000.>>caloCaloPosRand",cutstring,"goff")
 
     h_trackerCaloPos_noRadialField = gethist("trackerCaloPos_noRadialField", 
                         "Tracker Calo Face Position [Straight Line Extrapolation] vs. Time; Time [#mu s]; y [mm]; Station Number",
