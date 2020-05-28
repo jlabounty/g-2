@@ -8,6 +8,7 @@
 *.csv
 *.tar.gz 
 *.gz 
+*.pickle
 */*.tar.gz 
 .vscode/*
 */.ipynb_checkpoints/*
@@ -66,3 +67,14 @@ database/*/*fcl
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Personal files *
+#####################
+beaglebones/sendToBeagle/sendToBeagle/g-2/beagle-code
+blinding/RandomLib-1.10/src/Random.o
+Untitled*
+**/Untitled* 
+*/Untitled*.ipynb 
+*/*/Untitled*.ipynb 
+**/**/Untitled*.ipynb 
+**/Untitled.ipynb
