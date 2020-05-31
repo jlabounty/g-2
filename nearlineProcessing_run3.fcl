@@ -1,5 +1,7 @@
 # this fhicl is for nearline processing
 
+# #include "caloConfig.fcl"
+# #include "auxConfig.fcl"
 #include "syncPulseAverageTimes.fcl" 
 // #include "timingAlignmentConstants23609.fcl"
 // #include "timingAlignmentConstants_IntraAndInter_ForCalibration.fcl"
@@ -66,12 +68,10 @@ services :
   Database: 
   {
     conDBHost : 'dbdata0vm.fnal.gov'
-    #conDBPort : 9091
-    conDBPort : 9443
+    conDBPort : 9091
     conDBName : postgres_dev
     psqlDBHost  :  'g2db-priv'
     psqlDBPort  :  5433
-    #psqlDBPort  :  5445
     psqlDBName  :  'gm2_online_prod'
     psqlDBUser  :  'postgres'
   }
@@ -219,7 +219,6 @@ physics : {
      pedestalCorrector: 
      {
          module_type : PedestalOffsetCorrection
-         useDatabase     : false
          offsets:  @local::pedestal_offsets
      }
 
@@ -300,7 +299,7 @@ physics : {
       }
      
       #energyCalibratorDAQ: @local::caloChain.producers.energyCalibratorDAQ
-      energyCalibratorDAQ: # convert ADC integral to MeV 
+      energyCalibratorDAQ: 
       { 
          module_type             : DBEnergyCalibrator
          calibratorInstanceLabel : calibrator
@@ -317,29 +316,31 @@ physics : {
          gainCorrectionLimitLow : -1000.0
       }
 
-      # nearlineSyncAlarm : 
-      # {
-      #    module_type              : NearlineSyncPulseAlarm
-      #    correctorInstanceLabel   : corrector
-      #    nCalos                   : 24
-      #    nXtals                   : 54
-      #    syncPulseTimeCutLow      : 5000
-      #    syncPulseTimeCutHigh     : 5800
-      #    syncPulseMeanTime        : 5400
-      #    alignmentStrategy        : beam
-      #    t0ChannelNum             : 0
-      #    defaultDeltaTBeamSync    : 19420
-      #    t0integralModuleLabel    : t0PulseProcessor
-      #    t0integralInstanceLabel  : ""
-      #    t0syncPulseModuleLabel   : t0SyncProcessor
-      #    t0syncPulseInstanceLabel : ""
-      #    inputHitModuleLabel      : energyCorrector
-      #    inputHitInstanceLabel    : calibrator
-      #    syncPulseEnergyThreshold : 100
-      #    timeConstants            : @local::nearline_sync_timing_constants
-      # }
+      nearlineSyncAlarm : 
+      {
+         module_type              : NearlineSyncPulseAlarm
+         correctorInstanceLabel   : corrector
+         nCalos                   : 24
+         nXtals                   : 54
+         syncPulseTimeCutLow      : 5000
+         syncPulseTimeCutHigh     : 5800
+         syncPulseMeanTime        : 5400
+         alignmentStrategy        : beam
+         t0ChannelNum             : 0
+         defaultDeltaTBeamSync    : 19420
+         t0integralModuleLabel    : t0PulseProcessor
+         t0integralInstanceLabel  : ""
+         t0syncPulseModuleLabel   : t0SyncProcessor
+         t0syncPulseInstanceLabel : ""
 
-      timeCorrectorDAQ:  #correct for the sync pulse time offset
+         inputHitModuleLabel      : energyCorrector
+         inputHitInstanceLabel    : calibrator
+         syncPulseEnergyThreshold : 100
+
+         timeConstants            : @local::nearline_sync_timing_constants
+      }
+
+      timeCorrectorDAQ: 
       {
          module_type              : SyncPulseTimeCorrector
          correctorInstanceLabel   : corrector
@@ -364,7 +365,7 @@ physics : {
 	      #verboseLevel : 100
       }
 
-      energyCorrector :  #do the nearline gain calibration
+      energyCorrector : 
       {
          module_type : DBEnergyCalibrator
          correctorInstanceLabel : calibrator
@@ -382,18 +383,16 @@ physics : {
          verboseLevel : 100
       }
 
-      timeOffsetCorrectorDAQ: #perform inter/intra calorimeter timing alignment offsets, relative to calo 22 (T0)
+      timeOffsetCorrectorDAQ: 
       {
          module_type           : FixedTimeOffsetCorrection
          timeConstants         : @local::timing_alignment_constants
          # @table::caloChain.producers.timeOffsetCorrectorDAQ
          inputHitModuleLabel      : energyCorrector
          inputHitInstanceLabel    : calibrator
-         #inputHitModuleLabel      : timeCorrectorDAQ 
-         #inputHitInstanceLabel    : corrector
       } 
     
-     hitClusterDAQ: #perform clustering
+     hitClusterDAQ: 
      {
          # @table::caloChain.producers.hitClusterDAQ
          module_type            : HitCluster
@@ -480,7 +479,7 @@ physics : {
       }
 
 
-      clusterFinder: #identify double/triple/quad coincidences within a time / energy window
+      clusterFinder: 
       {
          module_type : ClusterCoincidenceFinder
          clusterModuleLabel: hitClusterDAQ
@@ -510,7 +509,7 @@ physics : {
       {
          module_type: CaloNearlineHistograms
          SelectEvents: [muonPath]
-         useDatabase: false
+         useDatabase: true
          excludeLaser : true
          ctagTimeCut: 24000
          ctagEnergyCutLow : 1700
@@ -542,8 +541,8 @@ physics : {
          ctagModuleLabel: ctagProducer
          ctagInstanceLabel: ctagLabel
          qUnpackerModuleLabel: tqUnpacker
-	      runStart: 33000
-	      runEnd: 33500
+	 runStart: 33000
+	 runEnd: 33500
          SelectEvents: [muonPath]
       }
 
@@ -624,7 +623,7 @@ physics : {
                       t0SyncProcessor,
                       t0PulseProcessor,
                       timeCorrectorDAQ,
-                      energyCorrector, #remove this from the path for development without the database
+                      energyCorrector,
                       #nearlineSyncAlarm,
                       timeOffsetCorrectorDAQ,
                       hitClusterDAQ,
@@ -636,9 +635,8 @@ physics : {
                       ibmsProcessor
                       ]
   
-  analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots, CTvsTT]
-  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, fastRotationPlots]
-  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots]
+  //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots, CTvsTT]
+  analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots]
   //analyzerPath: [ nearlineHistTree, clusterTree, ibmsAnalyzer, CoincidenceFinderLM, fastRotationPlots]
   //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer, ibmsAnalyzer, CoincidenceFinderLM]
   //analyzerPath: [ nearlineHistTree, clusterTree, ibmsAnalyzer]
@@ -647,7 +645,6 @@ physics : {
   //analyzerPath: [ nearlineHistTree, clusterTree, t0Analyzer]
   //analyzerPath: [ nearlineHistTree, clusterTree ]
   //analyzerPath: [ nearlineHistTree ]
-  //analyzerPath : [islands]
 
   trigger_paths  : [ muonPath ]
   end_paths      : [ analyzerPath ]
