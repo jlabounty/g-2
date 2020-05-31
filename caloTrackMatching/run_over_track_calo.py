@@ -11,12 +11,14 @@ def main():
     funcdict = {'trackCalo':trackcalo, 'clusters':clusters, 'tracks':tracks, 'trackAndTrackCalo':trackCaloSam}
 
     paths = [
-        #'./input/',                 #run2c trees
-        #'./input_endgame/',         #endgame trees for tracks only
-        './input_endgame_sam/',    #endgame trees for clusters + calo-track matching
-        #'./data/',                 #test directory for local area
+        "./input_9day/",        #9day trees
+        './input/',             #run2c trees
+        './input_endgame/',     #endgame trees for tracks only
+        './input_endgame_sam/', #endgame trees for clusters + calo-track matching
+        #'./data/',             #test directory for local area
          ]
-    paths = ["/pnfs/GM2/scratch/users/labounty/caloTrackMatching/"+x for x in paths]
+
+    paths = ["/pnfs/GM2/scratch/users/labounty/caloTrackMatching/"+x for x in paths] #get the skimmed versions
     #path = paths[3]
     #files = ['gm2tracker_ana.root']
     for path in paths:
@@ -44,6 +46,7 @@ def main():
                     funcdict[name]("", f, file)
                 else:
                     print("Cannot access this directory. Skipping file", file)
+            #break
                 
     print("All done!")
 
@@ -161,14 +164,14 @@ def trackcalo(name, f, file):
                         "Tracker Calo Face Position [Straight Line Extrapolation] vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
     #t.Draw("station:(clusterTime-decayTime)*decayVertexMomY/(14.9723):clusterTime/1000.>>h_trackerCaloPos_noRadialField",cutstring,"goff")
-    t.Draw("station:(decayVertexPosY - (time - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):clusterTime/1000.>>h_trackerCaloPos_noRadialField",cutstring,"goff")
+    #t.Draw("station:(decayVertexPosY - (clusterTime - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):clusterTime/1000.>>h_trackerCaloPos_noRadialField",cutstring,"goff")
 
 
     h_trackerCaloPos_noRadialFieldRand = gethist("trackerCaloPos_noRadialFieldRand", 
                         "Tracker Calo Face Position [Straight Line Extrapolation] vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
     #t.Draw("station:(clusterTime-decayTime)*decayVertexMomY/(14.9723):clusterTime/1000.>>h_trackerCaloPos_noRadialField",cutstring,"goff")
-    t.Draw("station:(decayVertexPosY - (time - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):testfunc(clusterTime)/1000.>>h_trackerCaloPos_noRadialFieldRand",cutstring,"goff")
+    #t.Draw("station:(decayVertexPosY - (clusterTime - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):testfunc(clusterTime)/1000.>>h_trackerCaloPos_noRadialFieldRand",cutstring,"goff")
 
     saveToRootFile("./data/matchedTracks_"+file,  [h_trackerBeamPos, h_trackerCaloPos, h_caloCaloPos,
                                                    h_trackerCaloPosRand, h_caloCaloPosRand, h_trackerBeamPosRand,
@@ -214,7 +217,6 @@ def trackCaloSam(name, f, file):
                         "Calo Face Position from Clusters vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
     t.Draw("station:(clusterY):clusterTime/1000.>>caloCaloPos",cutstring,"goff")
-
     
     h_caloCaloPosRand = gethist("caloCaloPosRand", 
                         "Calo Face Position from Clusters vs. Rand Time; Time [#mu s]; y [mm]; Station Number",
@@ -273,7 +275,7 @@ def tracks(name, f, file):
     h_trackerCaloPos_noRadialField = gethist("trackerCaloPos_noRadialField", 
                         "Tracker Calo Face Position [Straight Line Extrapolation] vs. Time; Time [#mu s]; y [mm]; Station Number",
                         4698, 0, 700).Clone()
-    t.Draw("station:maxDriftTime*decayVertexMomY/(14.9723):decayTime/1000.>>trackerCaloPos_noRadialField",cutstring,"goff")
+    #t.Draw("station:maxDriftTime*decayVertexMomY/(14.9723):decayTime/1000.>>trackerCaloPos_noRadialField",cutstring,"goff")
     t.Draw("station:(decayVertexPosY - (time - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):(time)/1000.>>trackerCaloPos_noRadialField",cutstring,"goff")
 
 
@@ -284,9 +286,21 @@ def tracks(name, f, file):
     t.Draw("station:(decayVertexPosY - (time - decayTime)*299.79*decayVertexMomY/TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)):testfunc(time)/1000.>>trackerCaloPos_noRadialFieldRand",cutstring,"goff")
 
 
-    saveToRootFile("./data/tracksOnly_"+file, [h_trackerBeamPos, h_trackerCaloPos, 
+    h_trackerDeltaPosition_vs_Time = r.TH2D("trackerDeltaPosition_vs_Time",
+            "Vertical Drift of Decay Positrons: Difference Between Naive and Full Extrapolation; Time [#mus]; Tracker #deltay [mm] -  Naive Extrapolation: y_{0} - #deltat*c*p_{y}/p_{tot} [mm]",
+            700, 0,  700,
+            100,-100,100
+          ).Clone()
+
+    decayVertexMom = " (TMath::Sqrt(decayVertexMomZ**2 + decayVertexMomY**2 + decayVertexMomZ**2)) "
+    deltaY_n_string         = " ( (time -  decayTime) * 299.79 * decayVertexMomY / "+decayVertexMom+") "
+    deltaY_tracker_string   = " (decayVertexPosY - caloVertexPosY) "
+    t.Draw( deltaY_n_string+" - "+deltaY_tracker_string+":testfunc(time)/1000.>>trackerDeltaPosition_vs_Time", cutstring, "goff")
+
+    saveToRootFile("./data/tracksOnly_"+file, [ h_trackerBeamPos, h_trackerCaloPos, 
                                                 h_trackerBeamPosRand, h_trackerCaloPosRand, 
-                                                h_trackerCaloPos_noRadialField,h_trackerCaloPos_noRadialFieldRand])
+                                                h_trackerCaloPos_noRadialField,h_trackerCaloPos_noRadialFieldRand,
+                                                h_trackerDeltaPosition_vs_Time])
 
 
 

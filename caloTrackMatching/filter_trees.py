@@ -9,7 +9,8 @@ def main():
     paths = [
         #'./input/', 
         #'./input_endgame/', 
-        './input_endgame_sam/',
+        #'./input_endgame_sam/',
+        "./input_9day/",
         #'./data/',
          ]
 
