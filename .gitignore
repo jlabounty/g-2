@@ -82,3 +82,9 @@ docker/nearline_sl7/build_slf7.x86_64/*
 docker/nearline_sl7/srcs/*
 docker/nearline_sl7/localProducts_gm2_v9_44_00_prof/*
 beaglebones/sendToBeagle/sendToBeagle/g-2/beagle-code
+**/*beagle-code*
+*mid
+docker/.bash_profile
+docker/.bashrc
+
+
