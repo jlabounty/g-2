@@ -691,7 +691,7 @@ class fitHist(fitVector):
             nfit        - number of times to perform the fit (for convergence)
             input_file  - see fitVector class for usage.
     '''
-    def __init__(self, hist, func, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None):
+    def __init__(self, hist, func, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None, binWidthAsXErrors = True):
         #extract the required information from the histogram
         import numpy as np 
 
@@ -714,7 +714,11 @@ class fitHist(fitVector):
                     yerr.append(hist.GetBinError(i))
                 else:
                     yerr.append(0)
-                xerr.append(0) # TODO: Implement x errors in a consistent way
+                if(binWidthAsXErrors):
+                    xerr.append(hist.GetBinWidth(i)) 
+                else:
+                    xerr.append(0)
+                    
         elif( checkIfPythonHist(hist) ):
             #python histogram
             nbins = len(hist[0])
