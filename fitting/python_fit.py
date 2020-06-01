@@ -246,7 +246,7 @@ class fitVector():
         else:
             return label
         
-    def labelFit(self, parNames=None, functionString=None, formatStr="7.3E", func=None):
+    def labelFit(self, parNames=None, functionString=None, formatStr="7.3E", func=None,fitname=None):
         import ROOT as r
         import textwrap
         import ctypes 
@@ -267,7 +267,9 @@ class fitVector():
             parstring = "Fit Result ["+str(round(x1,2))+" - "+str(round(x2,2))+"]"+"\n"
         else:
             parstring = "Fit Result"+"\n"
-            
+        if(fitname is not None):
+            parstring += str(fitname)+"\n"
+
         if(functionString is not None):
             wrapped = textwrap.wrap(functionString, 25)
             parstring+="Function: "+wrapped[0]+"\n"
@@ -361,7 +363,7 @@ class fitVector():
         
         return (fig, axs)
 
-    def drawFitResult(self, ax, scaleFactor=100, drawFormat="-", label="Default", color="xkcd:orange"):
+    def drawFitResult(self, ax, scaleFactor=100, drawFormat="-", label="Default", color="xkcd:orange", fitname=None):
         #print(fitresult)
         '''
             Draws a fit result object returned by fitVector function on 'ax' (axes or plot from matplotlib)
@@ -379,7 +381,7 @@ class fitVector():
             ys = self.fitx
         
         if(label == "Default"):
-            labelString = self.labelFit( None, str(self.f.GetExpFormula()), "7.3E",self.f) 
+            labelString = self.labelFit( None, str(self.f.GetExpFormula()), "7.3E",self.f, fitname=fitname) 
         else:
             labelString = label
         
@@ -634,14 +636,16 @@ def fitHistGaussian(hist, ax, draw = False, label=True):
         
     return fiti
     
-def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = True):
+def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = True, labelData = False):
     '''
         Utility to compare overtop two members of the fitVector class
         Inputs:
-            fitdict - dictionary of name:fit
-            fig,ax (optional) - axes to draw the fit on
-            fmt - format string
-            drawFits - bool, whether or not to draw the fit results
+            fitdict             - dictionary of name:fit
+            fig,ax (optional)   - axes to draw the fit on
+            fmt                 - format string
+            drawFits            - bool, whether or not to draw the fit results
+            drawData            - bool, whether or not the draw the underlying data
+            labelData           - bool, whether or not to label the data on the legend
         Returns:
             fig,ax
     '''
@@ -657,12 +661,16 @@ def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = 
     for name in fitdict:
         fit = fitdict[name]
         #ax.plot(fit.x, fit.y, fmti, color=datacolors[counter],label="Data: "+str(name))
+        if(labelData):
+            datalabel="Data: "+str(name) 
+        else:
+            datalabel=None 
         if(drawData):
             ax.errorbar(fit.x, fit.y, fmt=fmti, yerr=fit.yerr, 
                         ecolor='xkcd:grey', color=datacolors[counter],
-                        label="Data: "+str(name) )
+                        label=datalabel)
         if(drawFits):
-            fit.drawFitResult(ax,color=colors[counter], scaleFactor=1000)
+            fit.drawFitResult(ax,color=colors[counter], scaleFactor=1000, fitname=name)
         counter+=1
         
     plt.title("Comparison of Fits")
@@ -670,7 +678,35 @@ def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = 
     plt.grid()
     return (fig,ax)
 
-def fitHist(hist):
+class fitHist(fitVector):
     '''
-        Takes as input a root histogram and 
+        Subclass of the fitVector class
+        Takes as input a root or python histogram and converts it to a vector format, then passes that to the fitVector class
     '''
+    def __init__(self, hist, func, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None):
+        #extract the required information from the histogram
+        if("TH1" in str(type(hist))):
+            self.inputHist = hist.Clone("inputHist")
+            self.inputHist.SetDirectory(0)
+            self.binWidth = hist.GetBinWidth(1)
+            nbins = hist.GetNbinsX()
+            xs = []
+            ys = []
+            xerr = []
+            yerr = []
+            for i in range(1,nbins+1):
+                xs.append(hist.GetBinCenter(i))
+                ys.append(hist.GetBinContent(i))
+                if(binErrors):
+                    yerr.append(hist.GetBinError(i))
+                else:
+                    yerr.append(0)
+                xerr.append(0) # TODO: Implement x errors in a consistent way
+        else:
+            raise ValueError("Histogram type unsupported")
+
+
+        #use the fitVector init class
+        fitVector.__init__(self, x=xs, y=ys, function=func, xerr = xerr, yerr = yerr, 
+                            fitoptions = fitoptions, nFit = nfit, input_file=input_file)
+
