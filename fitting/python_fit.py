@@ -680,20 +680,33 @@ def compareFits(fitdict, fig=None, ax=None, fmti=',', drawFits=True, drawData = 
 
 class fitHist(fitVector):
     '''
-        Subclass of the fitVector class
-        Takes as input a root or python histogram and converts it to a vector format, then passes that to the fitVector class
+        Subclass of the fitVector class.
+        Takes as input a root or python histogram and converts it to a vector format, then passes that to the fitVector class.
+        Currently assumes uniform binning.
+        Input:
+            hist        - root TH1 or TProfile Object
+            func        - root TF1 object, to be fit
+            binerrors   - whether or not to use the bin errors as yerr's in the fit
+            fitoptions  - options passed to roots fitter
+            nfit        - number of times to perform the fit (for convergence)
+            input_file  - see fitVector class for usage.
     '''
     def __init__(self, hist, func, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None):
         #extract the required information from the histogram
-        if("TH1" in str(type(hist))):
+        import numpy as np 
+
+        xs = []
+        ys = []
+        xerr = []
+        yerr = []
+
+        if("TH1" in str(type(hist)) or "ROOT.TProfile" in str(type(hist))):
+            #root histogram
             self.inputHist = hist.Clone("inputHist")
             self.inputHist.SetDirectory(0)
-            self.binWidth = hist.GetBinWidth(1)
+            self.binWidth = hist.GetBinWidth(1) #Assumes uniform binning.
             nbins = hist.GetNbinsX()
-            xs = []
-            ys = []
-            xerr = []
-            yerr = []
+            
             for i in range(1,nbins+1):
                 xs.append(hist.GetBinCenter(i))
                 ys.append(hist.GetBinContent(i))
@@ -702,6 +715,22 @@ class fitHist(fitVector):
                 else:
                     yerr.append(0)
                 xerr.append(0) # TODO: Implement x errors in a consistent way
+        elif( checkIfPythonHist(hist) ):
+            #python histogram
+            nbins = len(hist[0])
+            self.inputHist = hist 
+            self.binWidth = hist[1][1] - hist[1][0]
+
+            ys = hist[0]
+
+            for i in range(len(ys)):
+                xs.append( (hist[1][i+1] + hist[1][i])/2.0 )
+                xerr.append(0)
+                if(binErrors):
+                    yerr.append(np.sqrt(ys[i]))
+                else:
+                    yerr.append(0)
+
         else:
             raise ValueError("Histogram type unsupported")
 
@@ -710,3 +739,15 @@ class fitHist(fitVector):
         fitVector.__init__(self, x=xs, y=ys, function=func, xerr = xerr, yerr = yerr, 
                             fitoptions = fitoptions, nFit = nfit, input_file=input_file)
 
+
+def checkIfPythonHist(hist):
+    if(len(hist) is not 3):
+        return False 
+    if("numpy.ndarray" not in str(type(hist[0]))):
+        return False
+    if("numpy.ndarray" not in str(type(hist[1]))):
+        return False
+    if("matplotlib.cbook." not in str(type(hist[2]))):
+        return False
+
+    return True
