@@ -349,10 +349,10 @@ class fitVector():
             
         if(do_pulls):
             ax.set_title("Histogram of Fit Pulls")
-            hist1 = ax.hist(self.pullsInRange, bins=40)
+            hist1 = ax.hist(self.pullsInRange, bins=41)
         else:
             ax.set_title("Histogram of Fit Residuals")
-            hist1 = ax.hist(self.residualsInRange, bins=40)
+            hist1 = ax.hist(self.residualsInRange, bins=41)
             
         if(fit_hist):
             fitHistGaussian(hist1, ax, True, True)
