@@ -718,7 +718,7 @@ class fitHist(fitVector):
                     xerr.append(hist.GetBinWidth(i)) 
                 else:
                     xerr.append(0)
-                    
+
         elif( checkIfPythonHist(hist) ):
             #python histogram
             nbins = len(hist[0])
@@ -729,7 +729,7 @@ class fitHist(fitVector):
 
             for i in range(len(ys)):
                 xs.append( (hist[1][i+1] + hist[1][i])/2.0 )
-                xerr.append(0)
+                xerr.append(self.binWidth)
                 if(binErrors):
                     yerr.append(np.sqrt(ys[i]))
                 else:
