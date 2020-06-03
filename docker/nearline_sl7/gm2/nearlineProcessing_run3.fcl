@@ -69,11 +69,11 @@ services :
     #conDBPort : 9091
     conDBPort : 9443
     conDBName : postgres_dev
-    psqlDBHost  :  'g2db-priv'
-    psqlDBPort  :  5433
-    #psqlDBPort  :  5445
-    psqlDBName  :  'gm2_online_prod'
-    psqlDBUser  :  'postgres'
+   #  psqlDBHost  :  'g2db-priv'
+   #  #psqlDBPort  :  5433
+   #  psqlDBPort  :  5445
+   #  psqlDBName  :  'gm2_online_prod'
+   #  psqlDBUser  :  'postgres'
   }
 
   # message service
