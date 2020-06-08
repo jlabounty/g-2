@@ -363,7 +363,7 @@ class fitVector():
         
         return (fig, axs)
 
-    def drawFitResult(self, ax, scaleFactor=100, drawFormat="-", label="Default", color="xkcd:orange", fitname=None):
+    def drawFitResult(self, ax, scaleFactor=100, drawFormat="-", label="Default", color="xkcd:orange", fitname=None, xrange=None):
         #print(fitresult)
         '''
             Draws a fit result object returned by fitVector function on 'ax' (axes or plot from matplotlib)
@@ -371,7 +371,12 @@ class fitVector():
         import numpy as np
         #from standardInclude import labelFit
 
-        if(scaleFactor > 1):
+        if(xrange is not None):
+            x0 = xrange[0]
+            xn = xrange[1]
+            xs = np.linspace(x0,xn,scaleFactor)
+            ys = [self.f.Eval(xi) for xi in xs]
+        elif(scaleFactor > 1):
             x0 = self.x[0]
             xn = self.x[len(self.x)-1]
             xs = np.linspace(x0,xn,scaleFactor)
