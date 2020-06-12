@@ -32,6 +32,7 @@ class fitVector():
         y = list(y)
         if(xerr is not None):
             xerr = list(xerr)
+        if(yerr is not None):
             yerr = list(yerr)
         
         fnew = function#.Clone()
@@ -48,31 +49,23 @@ class fitVector():
                     gri.SetPointError(pointi, xerr[pointi], yerr[pointi])
                 pointi += 1
         for i in range(nFit):
-            fitresult = gri.Fit(fnew, fitoptions+"S")
-            
-        cov = fitresult.GetCovarianceMatrix()
-        #conf_int = ctypes.c_double
-        if (len(x) == len(fitresult.GetConfidenceIntervals(0.95))):
-            conf_int = [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
-            self.xmin = min(x)
-            self.xmax = max(x)
-        else:
-            x1 = ctypes.c_double()
-            x2 = ctypes.c_double()
-            fnew.GetRange(x1,x2)
-            x1 = x1.value
-            x2 = x2.value
+            print("Starting fit", i+1,"/", nFit)
+            #TODO: replace this function with a custom minimizer
+            self.fitresult = gri.Fit(fnew, fitoptions+"S")
+        print("Fits complete. Finding confidence intervals.")
 
-            self.xmin = x1
-            self.xmax = x2
-            #print(x1,x2)
-            conf_int_x = [xi for xi in x if(xi >= x1 and xi <= x2)]
-            conf_int_y = [fnew.Eval(xi) for xi in conf_int_x]
-            #conf_int = [0 for i in range(len(x))]
-            conf_int = [ conf_int_x, 
-                        conf_int_y,
-                        [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
-            
+        cov = self.fitresult.GetCovarianceMatrix()
+        x1 = ctypes.c_double()
+        x2 = ctypes.c_double()
+        fnew.GetRange(x1,x2)
+        x1 = x1.value
+        x2 = x2.value
+
+        self.xmin = x1
+        self.xmax = x2
+        print("Function range:", x1,x2)
+        
+        print("Getting parameters / errors")
         #get the fit parameters and associated errors
         pars = []
         parErrs = []
@@ -121,11 +114,29 @@ class fitVector():
         self.parErrs = parErrs 
         self.chiSq = chiSq 
         self.covarianceMatrix = cov 
-        self.confidenceIntervals = conf_int 
+        self.confidenceIntervals = None #conf_int 
         self.residuals = residuals 
         self.pulls = pulls 
         self.residualsInRange = residualsInRange
         self.pullsInRange = pullsInRange
+
+    def computeConfidenceIntervals(self):
+        import ROOT as r
+        import numpy as np
+        import time
+        import ctypes 
+
+        conf_int = ctypes.c_double
+        if (len(self.x) == len(self.fitresult.GetConfidenceIntervals(0.95))):
+            conf_int = [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
+        else:
+            conf_int_x = [xi for xi in x if(xi >= self.xmin and xi <= self.xmax)]
+            conf_int_y = [self.f.Eval(xi) for xi in conf_int_x]
+            #conf_int = [0 for i in range(len(x))]
+            conf_int = [ conf_int_x, 
+                        conf_int_y,
+                        [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
+        
 
     def from_file(self, filename):
         print("Importing from:", filename)
@@ -205,7 +216,9 @@ class fitVector():
         return [self.convertRootLabelsToPython(str(self.f.GetParName(i))) for i in range(len(self.pars))]
 
     def drawConfidenceIntervals( self, ax, color='blue',labeli=None, drawHist=True):
-
+        if(self.confidenceIntervals is None):
+            print("Error: confidence intervals not properly defined")
+            return
         if(len(self.confidenceIntervals) is not 3):
             xvals = self.x
             conf_int_high = [x+y for (x,y) in zip(self.fitx, self.confidenceIntervals)]
@@ -272,7 +285,8 @@ class fitVector():
 
         if(functionString is not None):
             wrapped = textwrap.wrap(functionString, 25)
-            parstring+="Function: "+wrapped[0]+"\n"
+            if(len(wrapped) > 0):
+                parstring+="Function: "+wrapped[0]+"\n"
             if(len(wrapped)>1):
                 for fi in wrapped[1:]:
                     parstring += "                "+fi+"\n"
@@ -307,7 +321,7 @@ class fitVector():
 
         axs = [ax1, ax2, ax3]
         ax = axs[0]
-        ax.errorbar(self.x, self.y ,yerr=self.yerr, fmt=fmti, label="Data", ecolor='xkcd:grey', zorder=35)
+        ax.errorbar(self.x, self.y, xerr=self.xerr ,yerr=self.yerr, fmt=fmti, label="Data", ecolor='xkcd:grey', zorder=35)
         
         self.drawFitResult(ax, scaleFactor=int(len(self.x)*10))
         self.drawConfidenceIntervals(ax,"blue", "95% Confidence Level")
@@ -430,9 +444,10 @@ class fitVector():
         return ding
 
     def plotRunningAverage(self, averages=[1,10,100], showplot=True, fmti="."):
+        import matplotlib.pyplot as plt  
         fig,ax = plt.subplots(figsize=(15,5))
         for average in averages:
-            fitresult.plotResiduals(ax, 1, fmti, str(average), average)
+            self.plotResiduals(ax, 1, fmti, str(average), average)
         plt.grid()
         plt.title("Running Average of Residuals")
         plt.legend()
@@ -556,7 +571,7 @@ class fitVector():
                 stri = r.TNamed(key,item)
                 stri.Write()
 
-            elif( "ROOT.TF1" in (str(type(item))) ):
+            elif( "ROOT.TF1" in (str(type(item))) or "ROOT.TH1" in (str(type(item))) or "ROOT.TProf" in (str(type(item))) ):
                 f1 = item
                 f1.Write(key)
 
@@ -698,6 +713,7 @@ class fitHist(fitVector):
     '''
     def __init__(self, hist, func, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None, binWidthAsXErrors = True):
         #extract the required information from the histogram
+        #TODO: Enable support for histogram bin corellations
         import numpy as np 
 
         xs = []
@@ -750,6 +766,9 @@ class fitHist(fitVector):
 
 
 def checkIfPythonHist(hist):
+    '''
+        Function called by the fitHist class to determine whether the input object is a supported type 
+    '''
     if(len(hist) is not 3):
         return False 
     if("numpy.ndarray" not in str(type(hist[0]))):
@@ -760,3 +779,73 @@ def checkIfPythonHist(hist):
         return False
 
     return True
+
+class omega_a_fit(fitHist):
+    '''
+        Implements omega_a fitting with a fitHist (fitVector) backend. This function should be called on the final 1-D 
+            histogram to be fit, after all corrections have been applied. Other classes can inherit from this class to enable
+            energy threshold scans and such.
+    '''
+
+    def getfit(self, func_string, read_from_file = True):
+        '''
+            Function to initialize an omega_a fit. Here we can include a standard array of functions as well as a custom function.
+            The format of the input file should be a .py file and should include:
+                - Function to be fit, either in the form of a string or a more complicated fit function
+                - A dictionary of the following items:
+                    - The name of the function to be called
+                    - The blinding string
+                    - The fit range of the function
+                    - The number of parameters in the function
+        '''
+        import ROOT as r 
+        import importlib
+
+        if(read_from_file):
+            try:
+                fitconfig = importlib.import_module(func_string.split(".py")[0])
+            except:
+                raise ValueError("Unable to import "+str(func_string))
+
+            python_function = fitconfig.fitfunc
+            self.fitdict = fitconfig.fitdict
+            print(self.fitdict)
+
+            func = r.TF1("func", python_function, self.fitdict['fitrange'][0], self.fitdict['fitrange'][1], 
+                                 self.fitdict['npar'] )
+
+            for i in range(len(self.fitdict['initial_values'])):
+                func.SetParameter(i, self.fitdict['initial_values'][i])
+                func.SetParName(i, self.fitdict['parnames'][i])
+
+            
+
+        else:
+            func = r.TF1("func", python_function, 0, 700) # default function
+            fitrange = [0,700]
+            npar = None 
+            print("Warning: Using default function with range 0-700. Proceed with caution.")
+
+        
+
+        return (func, self.fitdict['fitrange'], self.fitdict['npar'])
+
+    def __init__(self, hist, func_config_file, binErrors = True, fitoptions = "RQ", nfit=2, input_file=None, binWidthAsXErrors = True):
+        #g-2 Blinding Software
+        from BlindersPy3 import Blinders
+        from BlindersPy3 import FitType
+        import ROOT as r 
+
+        self.binErrors = binErrors
+        self.fitoptions = fitoptions
+        self.nfit = nfit 
+        self.input_file = input_file 
+        self.binWidthAsXErrors = binWidthAsXErrors
+
+        func, fitrange, npar = self.getfit(func_config_file)
+        self.fitrange = fitrange
+        self.npar = npar 
+
+        fitHist.__init__(self,  hist, func, binErrors = binErrors, fitoptions = fitoptions, 
+                                nfit=nfit, input_file=input_file, binWidthAsXErrors = binWidthAsXErrors)
+
