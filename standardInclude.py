@@ -2,18 +2,24 @@
 
 #Interactive matplotlib plots
 #%matplotlib inline
-import mpld3
-mpld3.enable_notebook()
+try:
+    import mpld3
+    mpld3.enable_notebook()
+    def setint():
+        mpld3.enable_notebook()
+        matplotlib.rc('xtick', labelsize=10) 
+        matplotlib.rc('ytick', labelsize=10)
+    def noint():
+        mpld3.disable_notebook()
+        matplotlib.rc('xtick', labelsize=20) 
+        matplotlib.rc('ytick', labelsize=20)
+    #By default, start with interactive plots off.
+    noint()
+except:
+    print("Not a jupyter notebook. Not enabling notebook functions.")
 import matplotlib.pyplot as plt
 import matplotlib 
-def setint():
-    mpld3.enable_notebook()
-    matplotlib.rc('xtick', labelsize=10) 
-    matplotlib.rc('ytick', labelsize=10)
-def noint():
-    mpld3.disable_notebook()
-    matplotlib.rc('xtick', labelsize=20) 
-    matplotlib.rc('ytick', labelsize=20)
+
 
 #General python imports
 import math
@@ -80,8 +86,7 @@ def toast(text):
     else:
         print("ERROR: Unable to send toast with message ", text)
 
-#By default, start with interactive plots off.
-noint()
+
 
 print("For interactive plots, run: setint()")
 print("To return to non-interactive plots (default state), run: noint()")
