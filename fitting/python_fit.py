@@ -120,22 +120,38 @@ class fitVector():
         self.residualsInRange = residualsInRange
         self.pullsInRange = pullsInRange
 
-    def computeConfidenceIntervals(self):
+    def computeConfidenceIntervals(self, interval = 0.95, xrange=None, npoints=100):
         import ROOT as r
         import numpy as np
         import time
         import ctypes 
 
         conf_int = ctypes.c_double
-        if (len(self.x) == len(self.fitresult.GetConfidenceIntervals(0.95))):
-            conf_int = [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(self.x))] #95% confidence level for this fit
+        if (len(self.x) == len(self.fitresult.GetConfidenceIntervals(interval))):
+            conf_int = [ self.fitresult.GetConfidenceIntervals(interval)[i] for i in range(len(self.x))] #95% confidence level for this fit
+        elif(xrange is not None):
+            conf_int_x = [xi for xi in np.linspace(xrange[0], xrange[1], npoints+1)]
+            conf_int_y = [self.f.Eval(xi) for xi in conf_int_x]
+            #conf_int = [0 for i in range(len(x))]
+            conf_int_result = (ctypes.c_double * len(conf_int_x))()#(*conf_int_x)
+            # print(type(conf_int_result))
+            self.fitresult.GetConfidenceIntervals(len(conf_int_x), 1,1,
+                                                    # conf_int_x, 
+                                                    (ctypes.c_double * len(conf_int_x))(*conf_int_x),
+                                                    conf_int_result, 
+                                                    interval, True)
+            # print(conf_int_result)
+            conf_int_result_2 = [x for x in conf_int_result]
+            conf_int = [conf_int_x, 
+                        conf_int_y,
+                        conf_int_result_2 ] 
         else:
             conf_int_x = [xi for xi in self.x if(xi >= self.xmin and xi <= self.xmax)]
             conf_int_y = [self.f.Eval(xi) for xi in conf_int_x]
             #conf_int = [0 for i in range(len(x))]
             conf_int = [ conf_int_x, 
                         conf_int_y,
-                        [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(self.fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
+                        [ self.fitresult.GetConfidenceIntervals(interval)[i] for i in range(len(self.fitresult.GetConfidenceIntervals(interval)))]] #95% confidence level for this fit
         self.confidenceIntervals = conf_int
 
     def from_file(self, filename):
