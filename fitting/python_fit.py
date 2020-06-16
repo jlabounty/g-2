@@ -49,10 +49,10 @@ class fitVector():
                     gri.SetPointError(pointi, xerr[pointi], yerr[pointi])
                 pointi += 1
         for i in range(nFit):
-            print("Starting fit", i+1,"/", nFit)
+            # print("Starting fit", i+1,"/", nFit)
             #TODO: replace this function with a custom minimizer
             self.fitresult = gri.Fit(fnew, fitoptions+"S")
-        print("Fits complete. Finding confidence intervals.")
+        # print("Fits complete. Finding confidence intervals.")
 
         cov = self.fitresult.GetCovarianceMatrix()
         x1 = ctypes.c_double()
@@ -63,9 +63,9 @@ class fitVector():
 
         self.xmin = x1
         self.xmax = x2
-        print("Function range:", x1,x2)
+        # print("Function range:", x1,x2)
         
-        print("Getting parameters / errors")
+        # print("Getting parameters / errors")
         #get the fit parameters and associated errors
         pars = []
         parErrs = []
@@ -128,15 +128,15 @@ class fitVector():
 
         conf_int = ctypes.c_double
         if (len(self.x) == len(self.fitresult.GetConfidenceIntervals(0.95))):
-            conf_int = [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(x))] #95% confidence level for this fit
+            conf_int = [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(self.x))] #95% confidence level for this fit
         else:
-            conf_int_x = [xi for xi in x if(xi >= self.xmin and xi <= self.xmax)]
+            conf_int_x = [xi for xi in self.x if(xi >= self.xmin and xi <= self.xmax)]
             conf_int_y = [self.f.Eval(xi) for xi in conf_int_x]
             #conf_int = [0 for i in range(len(x))]
             conf_int = [ conf_int_x, 
                         conf_int_y,
-                        [ fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
-        
+                        [ self.fitresult.GetConfidenceIntervals(0.95)[i] for i in range(len(self.fitresult.GetConfidenceIntervals(0.95)))]] #95% confidence level for this fit
+        self.confidenceIntervals = conf_int
 
     def from_file(self, filename):
         print("Importing from:", filename)
@@ -217,8 +217,9 @@ class fitVector():
 
     def drawConfidenceIntervals( self, ax, color='blue',labeli=None, drawHist=True):
         if(self.confidenceIntervals is None):
-            print("Error: confidence intervals not properly defined")
-            return
+            # print("Error: confidence intervals not properly defined")
+            self.computeConfidenceIntervals()
+            # return
         if(len(self.confidenceIntervals) is not 3):
             xvals = self.x
             conf_int_high = [x+y for (x,y) in zip(self.fitx, self.confidenceIntervals)]
@@ -304,7 +305,8 @@ class fitVector():
         return parstring
 
     def draw(self,  title = "Fit Result", yrange=[None, None], xrange=None, data_title = "Data", 
-                    resid_title = "Fit Pulls", do_pulls=True, fit_hist=True, fmti=".-"):
+                    resid_title = "Fit Pulls", do_pulls=True, fit_hist=True, fmti=".-", 
+                    draw_confidence_intervals=False):
         '''
             Creates a figure in matplotlib and draws the fitresult / residuals on it
         '''
@@ -324,7 +326,8 @@ class fitVector():
         ax.errorbar(self.x, self.y, xerr=self.xerr ,yerr=self.yerr, fmt=fmti, label="Data", ecolor='xkcd:grey', zorder=35)
         
         self.drawFitResult(ax, scaleFactor=int(len(self.x)*10))
-        self.drawConfidenceIntervals(ax,"blue", "95% Confidence Level")
+        if(draw_confidence_intervals):
+            self.drawConfidenceIntervals(ax,"blue", "95% Confidence Level")
         ax.grid()
         if(yrange[0] is None):
             ymean = np.mean(self.y)
