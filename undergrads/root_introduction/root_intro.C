@@ -1,3 +1,10 @@
+// #include "TCanvas.h"
+// #include "TH1.h"
+// #include "TH2.h"
+// #include "TF1.h"
+// #include "TGraph.h"
+// #include "TRandom3.h"
+
 int root_intro() //the name of the function must match the name of the file for you to run it like 'root -l XXX'
 {
 
@@ -78,7 +85,7 @@ int root_intro() //the name of the function must match the name of the file for 
 	{
 		h2->Fill(rng->Gaus(0.50, .50), rng->Gaus(0.50, 50), weight); // we can fill the histogram with a different weight if we wish. If we leave off this argument, the default is 1
 	}
-
+ 
 	TCanvas *c4 = new TCanvas();
 	h2->Draw("colz"); //colz creates a colorscale
 	c4->Draw();
@@ -186,7 +193,8 @@ int root_intro() //the name of the function must match the name of the file for 
 	// In[34]:
 
 	TCanvas *c02 = new TCanvas();
-	func2->SetParameters(40000, 34.4, 0.53, 2, 2);
+	// func2->SetParameters(40000, 34.4, 0.53, 2, 2);
+	func2->SetParameters(2000,100,0.33,2,2);
 	h3->Fit(func2);
 	h3->Draw();
 	c02->Draw();
