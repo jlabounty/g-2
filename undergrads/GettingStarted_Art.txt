@@ -28,7 +28,15 @@ You can look in this fcl file to see what it's doing, but it essentially just us
 	ln -s /pnfs/GM2/daq/run1/offline/gm2_5040A/runs_16000/16368/gm2offline_full_21651868_16368.00041.root  input_file.root 
 And now run over it using your fcl file:
 	gm2 -c runAutoProductionFeedback_Calorimeters.fcl -s input_file.root -T output_file.root 
-This should run for a while and then spit out an output file called output_file.root (or whatever you want to call it). You can then open the output as normal
+This should run for a while and then spit out an output file called output_file.root (or whatever you want to call it). 
+
+If you encounter an error like:
+       > getBySelector: Found zero products matching all criteria
+       > Looking for type: art::TriggerResults
+       > cet::exception going through module CaloFarlineHistograms/farline run: 25898 subRun: 491 event: 1
+you might have to change the SelectEvents: [...] line to one of the commented versions. 
+
+You can then open the output as normal
 	root -l output_file.root
 NOTE: You may get an error like this
 	getBySelector: Found zero products matching all criteria
