@@ -359,7 +359,7 @@ class fitVector():
 
 
         ax = axs[1]
-        if(do_pulls):
+        if(do_pulls and (self.yerr is not None)):
             ax.set_title("Fit Pulls")
             self.plotResiduals(ax,1,fmti,"All Residuals",1)
         else:
@@ -380,7 +380,7 @@ class fitVector():
         ax = axs[2]
         ax.grid()
             
-        if(do_pulls):
+        if(do_pulls and (self.yerr is not None)):
             ax.set_title("Histogram of Fit Pulls")
             hist1 = ax.hist(self.pullsInRange, bins=41)
         else:
