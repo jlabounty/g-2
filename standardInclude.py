@@ -20,6 +20,12 @@ except:
 import matplotlib.pyplot as plt
 import matplotlib 
 
+import pickle
+import boost_histogram as bh
+
+from g2Reader import *
+from g2Fitter import *
+
 
 #General python imports
 import math
