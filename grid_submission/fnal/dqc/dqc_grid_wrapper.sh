@@ -84,7 +84,7 @@ if [[ "${pythonArgs}" == *"sam-dataset-True"* ]]; then
 		if [ "$fname" != "" ]
 		then
 			ifdh updateFileStatus $cpurl  $consumer_id $fname transferred
-			root -b -l extractNearline_init.C\(\"${fname}\",\"intermediate.sql\",1,2\)
+			root -b -l -q extractNearline_init.C\(\"${fname}\",\"intermediate.sql\",1,2\)
 			exit_status=$?
 			if [[ "$exit_status" == "0" ]];
 			then
@@ -140,7 +140,7 @@ else #original non-sam based version
 				echo "|" `echo ${xrdfile}` ";"
 
 				#xrootd version
-				root -b -l extractNearline_init.C\(\"${xrdfile}\",\"intermediate.sql\",1,2\)
+				root -b -l -q extractNearline_init.C\(\"${xrdfile}\",\"intermediate.sql\",1,2\)
 
 				#ifdh cp version
 				#ifdh cp -D ${directory}${file} .
