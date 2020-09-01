@@ -61,6 +61,13 @@ touch ${outfile}
 application="gm2"
 version="v9_41_00"
 host=`/bin/hostname`
+sam_max_files="" #TODO: Implement parsing of command line args for setting max files
+schema='xroot'
+
+if [[ "${pythonArgs}" == *"schemas-None"* ]]; then
+	schema="" # None
+fi 
+
 
 echo $application "/" $version 
 echo "Running on: " $host
@@ -70,7 +77,7 @@ if [[ "${pythonArgs}" == *"sam-dataset-True"* ]]; then
 
 	echo "Using SAM Dataset"
 	cpurl=`ifdh findProject $SAM_PROJECT_NAME ''`
-	consumer_id=`ifdh establishProcess $cpurl $application $version $host $GRID_USER "" "" "" `
+	consumer_id=`ifdh establishProcess $cpurl $application $version $host $GRID_USER "" "" ${sam_max_files} ${schema} `
 	echo "Established project with URL/ID: " $cpurl "/" $consumer_id
 
 	furi=`ifdh getNextFile $cpurl $consumer_id`

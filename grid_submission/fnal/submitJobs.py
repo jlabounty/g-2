@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--test", default=False, type=bool)
     parser.add_argument("-N", default=None)
     parser.add_argument("--tar", default="/pnfs/GM2/scratch/users/labounty/python.tar.gz")
+    parser.add_argument("--schemas", default='xroot', choices=['xroot', 'None'])
     parser.add_argument("--python-lib-dir", default="/pnfs/GM2/scratch/users/labounty/ding.tar.gz")
     parser.add_argument('--python-custom', default='/gm2/app/users/labounty/github/g-2/fitting/',help='The custom python files which will be tarred up and sent to the grid node along with the existing python tarball')
     
@@ -60,6 +61,8 @@ def main():
 
         jobstring += " -e SAM_PROJECT_NAME="+projname+" -e GRID_USER="+ding.user+" -e EXPERIMENT="+ding.group
         ding.python_args.append(" sam-dataset-True")
+        if( 'xroot' not in ding.schemas):
+            ding.python_args.append(" schemas-None")
 
         os.system('echo "ifdh endProject '+cpurl+' ; \n ifdh cleanup" > endscript.sh')
 
